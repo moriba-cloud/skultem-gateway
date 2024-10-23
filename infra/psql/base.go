@@ -4,7 +4,7 @@ import (
 	"github.com/moriba-build/ose/ddd/psql"
 	"github.com/moriba-cloud/skultem-gateway/infra/psql/repos"
 	"github.com/moriba-cloud/skultem-gateway/infra/psql/repos/feature"
-	"github.com/moriba-cloud/skultem-gateway/infra/psql/repos/year"
+	"github.com/moriba-cloud/skultem-gateway/infra/psql/repos/role"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -22,7 +22,7 @@ func Database(logger *zap.Logger) *repos.Repos {
 
 func migrate(db *gorm.DB) {
 	err := db.AutoMigrate(
-		&year.Year{}, feature.Feature{},
+		&feature.Feature{}, &role.Role{},
 	)
 	if err != nil {
 		panic(err)

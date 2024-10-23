@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/moriba-cloud/skultem-gateway/domain/feature"
+	"github.com/moriba-cloud/skultem-gateway/domain/role"
 	"github.com/moriba-cloud/skultem-gateway/domain/year"
 	"github.com/moriba-cloud/skultem-gateway/infra/management"
 	"github.com/moriba-cloud/skultem-gateway/infra/psql/repos"
@@ -12,6 +13,7 @@ type (
 	Apps struct {
 		Year    year.App
 		Feature feature.App
+		Role    role.App
 	}
 	Args struct {
 		Repos  *repos.Repos
@@ -29,6 +31,10 @@ func NewApps(args Args) *Apps {
 		}),
 		Feature: NewFeature(argsFeature{
 			Repo:   args.Repos.Feature,
+			Logger: args.Logger,
+		}),
+		Role: NewRole(argsRole{
+			Repo:   args.Repos.Role,
 			Logger: args.Logger,
 		}),
 	}
