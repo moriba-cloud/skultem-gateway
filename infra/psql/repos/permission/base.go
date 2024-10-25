@@ -26,20 +26,20 @@ type (
 	}
 )
 
-func (f Permission) Domain() (*permission.Domain, error) {
+func (p Permission) Domain() (*permission.Domain, error) {
 	return permission.Existing(permission.Args{
 		Aggregation: ddd.AggregationArgs{
-			Id:        f.ID,
-			State:     ddd.State(f.State),
-			CreatedAt: &f.CreatedAt,
-			UpdatedAt: &f.UpdatedAt,
+			Id:        p.ID,
+			State:     ddd.State(p.State),
+			CreatedAt: &p.CreatedAt,
+			UpdatedAt: &p.UpdatedAt,
 		},
-		Feature: f.Feature.Name,
-		Create:  f.Create,
-		Read:    f.Read,
-		ReadAll: f.ReadAll,
-		Edit:    f.Edit,
-		Delete:  f.Delete,
+		Feature: p.Feature.Name,
+		Create:  p.Create,
+		Read:    p.Read,
+		ReadAll: p.ReadAll,
+		Edit:    p.Edit,
+		Delete:  p.Delete,
 	})
 }
 

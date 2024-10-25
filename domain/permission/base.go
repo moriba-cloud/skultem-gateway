@@ -26,9 +26,11 @@ type (
 	}
 	App interface {
 		Update(ctx context.Context, args []*Args, role string) (*ddd.Response[Domain], error)
+		RolePermissions(ctx context.Context, role string) (*ddd.Response[Domain], error)
 	}
 	Repo interface {
 		Save(args []*Domain, roleId string) (*ddd.Response[Domain], error)
+		RolePermissions(role string) (*ddd.Response[Domain], error)
 		Check(feature string, role string) (*Domain, error)
 	}
 )

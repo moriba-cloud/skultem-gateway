@@ -30,11 +30,11 @@ type (
 	}
 	One struct {
 		Feature string `json:"feature" validate:"required"`
-		Create  bool   `json:"create" validate:"required"`
-		ReadAll bool   `json:"readAll" validate:"required"`
-		Read    bool   `json:"read" validate:"required"`
-		Edit    bool   `json:"edit" validate:"required"`
-		Delete  bool   `json:"delete" validate:"required"`
+		Create  bool   `json:"create"`
+		ReadAll bool   `json:"readAll"`
+		Read    bool   `json:"read"`
+		Edit    bool   `json:"edit"`
+		Delete  bool   `json:"delete"`
 	}
 	PermissionRequest struct {
 		Permissions []One `json:"permissions" validate:"required,dive,required"`
@@ -99,58 +99,28 @@ func (a apiPermission) new(c *fiber.Ctx) error {
 	}))
 }
 
-//
-//func (a apiRole) update(c *fiber.Ctx) error {
-//	byId := new(dto.ById)
-//	if err := c.ParamsParser(byId); err != nil {
-//		return err
-//	}
-//	if err := a.validation.Run(byId); err != nil {
-//		return err
-//	}
-//
-//	payload := new(RoleRequest)
-//	if err := c.BodyParser(payload); err != nil {
-//		return err
-//	}
-//	if err := a.validation.Run(payload); err != nil {
-//		return err
-//	}
-//
-//	res, err := a.app.Update(c.Context(), role.Args{
-//		Aggregation: ddd.AggregationArgs{
-//			Id: byId.Id,
-//		},
-//		Name:        payload.Name,
-//		Description: payload.Description,
-//	})
-//	if err != nil {
-//		return fiber.NewError(fiber.StatusNotAcceptable, err.Error())
-//	}
-//
-//	return c.JSON(dto.NewResponse(dto.ResponseArgs[Role]{
-//		Record: RoleResponse(res.Record()),
-//	}))
-//}
-//
-//func (a apiRole) remove(c *fiber.Ctx) error {
-//	payload := new(dto.ById)
-//	if err := c.ParamsParser(payload); err != nil {
-//		return err
-//	}
-//	if err := a.validation.Run(payload); err != nil {
-//		return err
-//	}
-//
-//	res, err := a.app.Remove(c.Context(), payload.Id)
-//	if err != nil {
-//		return fiber.NewError(fiber.StatusNotFound, err.Error())
-//	}
-//
-//	return c.JSON(dto.NewResponse(dto.ResponseArgs[Role]{
-//		Record: RoleResponse(res.Record()),
-//	}))
-//}
+func (a apiPermission) rolePermissions(c *fiber.Ctx) error {
+	byId := new(dto.ById)
+	if err := c.ParamsParser(byId); err != nil {
+		return err
+	}
+	if err := a.validation.Run(byId); err != nil {
+		return err
+	}
+
+	res, err := a.app.RolePermissions(c.Context(), byId.Id)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	records := make([]*Permission, 0)
+	for _, record := range res.Records() {
+		records = append(records, PermissionResponse(record))
+	}
+	return c.JSON(dto.NewResponse(dto.ResponseArgs[Permission]{
+		Records: records,
+	}))
+}
 
 func PermissionRoute(api fiber.Router, app permission.App, logger *zap.Logger) {
 	r := &apiPermission{
@@ -161,4 +131,5 @@ func PermissionRoute(api fiber.Router, app permission.App, logger *zap.Logger) {
 
 	router := api.Group("/permission")
 	router.Post("/:id", r.new)
+	router.Get("/:id", r.rolePermissions)
 }

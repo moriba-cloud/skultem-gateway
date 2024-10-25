@@ -29,10 +29,10 @@ func (m *model) Save(args []*permission.Domain, role string) (*ddd.Response[perm
 	}
 
 	m.logger.Info(fmt.Sprintf("saved permissions %d with id: %s", len(args), role))
-	return m.ListByRoleId(role)
+	return m.RolePermissions(role)
 }
 
-func (m *model) ListByRoleId(role string) (*ddd.Response[permission.Domain], error) {
+func (m *model) RolePermissions(role string) (*ddd.Response[permission.Domain], error) {
 	records := make([]*permission.Domain, 0)
 	models := make([]*Permission, 0)
 
