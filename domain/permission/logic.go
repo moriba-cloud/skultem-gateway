@@ -46,7 +46,7 @@ func Existing(args Args) (*Domain, error) {
 func validation(args Args) error {
 	errors := make([]string, 0)
 
-	if len(args.Feature) == 0 {
+	if len(args.Feature.Id) == 0 {
 		errors = append(errors, "feature is required")
 	}
 

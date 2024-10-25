@@ -5,6 +5,7 @@ import (
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
+	"github.com/moriba-cloud/skultem-gateway/domain/core"
 	"github.com/moriba-cloud/skultem-gateway/domain/permission"
 	"go.uber.org/zap"
 	"time"
@@ -18,7 +19,7 @@ type (
 	}
 	Permission struct {
 		Id        string    `json:"id"`
-		Feature   string    `json:"feature"`
+		Feature   Reference `json:"feature"`
 		Create    bool      `json:"create"`
 		ReadAll   bool      `json:"readAll"`
 		Read      bool      `json:"read"`
@@ -43,8 +44,11 @@ type (
 
 func PermissionResponse(o *permission.Domain) *Permission {
 	return &Permission{
-		Id:        o.ID(),
-		Feature:   o.Feature(),
+		Id: o.ID(),
+		Feature: Reference{
+			Id:    o.Feature().Id,
+			Value: o.Feature().Value,
+		},
 		Create:    o.Create(),
 		Read:      o.Read(),
 		ReadAll:   o.ReadAll(),
@@ -76,7 +80,9 @@ func (a apiPermission) new(c *fiber.Ctx) error {
 	permissions := make([]*permission.Args, len(payload.Permissions))
 	for i, one := range payload.Permissions {
 		permissions[i] = &permission.Args{
-			Feature: one.Feature,
+			Feature: core.Reference{
+				Id: one.Feature,
+			},
 			Create:  one.Create,
 			Read:    one.Read,
 			ReadAll: one.ReadAll,

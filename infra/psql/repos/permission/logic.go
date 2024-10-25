@@ -3,7 +3,9 @@ package permission
 import (
 	"fmt"
 	"github.com/moriba-build/ose/ddd"
+	"github.com/moriba-cloud/skultem-gateway/domain/core"
 	"github.com/moriba-cloud/skultem-gateway/domain/permission"
+	"github.com/moriba-cloud/skultem-gateway/infra/psql/repos/feature"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -34,19 +36,42 @@ func (m *model) Save(args []*permission.Domain, role string) (*ddd.Response[perm
 
 func (m *model) RolePermissions(role string) (*ddd.Response[permission.Domain], error) {
 	records := make([]*permission.Domain, 0)
-	models := make([]*Permission, 0)
+	features := make([]*feature.Feature, 0)
+	m.db.Find(&features)
 
-	m.db.Preload("Role").
-		Preload("Feature").
-		Where("role_id = ?", role).
-		Find(&models)
+	for _, o := range features {
+		var model *Permission
+		if err := m.db.Preload("Role").
+			Preload("Feature").
+			Where("role_id = ? and feature_id = ?", role, o.ID).
+			First(&model).
+			Error; err != nil {
 
-	for _, o := range models {
-		record, err := o.Domain()
-		if err != nil {
-			return nil, err
+			featureDomain, err := o.Domain()
+			if err != nil {
+				return nil, err
+			}
+
+			record, err := permission.New(permission.Args{
+				Feature: core.Reference{
+					Id:    featureDomain.ID(),
+					Value: featureDomain.Name(),
+				},
+				Create:  false,
+				Read:    false,
+				ReadAll: false,
+				Edit:    false,
+				Delete:  false,
+			})
+			records = append(records, record)
+		} else {
+			record, err := model.Domain()
+			if err != nil {
+				return nil, err
+			}
+			records = append(records, record)
 		}
-		records = append(records, record)
+
 	}
 
 	m.logger.Info(fmt.Sprintf("fetch %d permissions by role: %s", len(records), role))

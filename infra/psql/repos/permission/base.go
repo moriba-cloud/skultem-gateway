@@ -34,7 +34,7 @@ func (p Permission) Domain() (*permission.Domain, error) {
 			CreatedAt: &p.CreatedAt,
 			UpdatedAt: &p.UpdatedAt,
 		},
-		Feature: p.Feature.Name,
+		Feature: p.Feature.Reference(),
 		Create:  p.Create,
 		Read:    p.Read,
 		ReadAll: p.ReadAll,
@@ -47,7 +47,7 @@ func Model(args *permission.Domain, role string) Permission {
 	return Permission{
 		ID:        args.ID(),
 		RoleId:    role,
-		FeatureId: args.Feature(),
+		FeatureId: args.Feature().Id,
 		Create:    args.Create(),
 		Read:      args.Read(),
 		ReadAll:   args.ReadAll(),

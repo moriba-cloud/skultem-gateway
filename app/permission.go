@@ -37,11 +37,11 @@ func (a aPermission) Update(ctx context.Context, args []*permission.Args, role s
 	for i, arg := range args {
 		var o *permission.Domain
 
-		if _, err := a.feature.FindById(arg.Feature); err != nil {
+		if _, err := a.feature.FindById(arg.Feature.Id); err != nil {
 			errors = append(errors, fmt.Sprintf("feature '%s' not found", arg.Feature))
 		}
 
-		check, err := a.repo.Check(arg.Feature, role)
+		check, err := a.repo.Check(arg.Feature.Id, role)
 		if check != nil {
 			arg.Aggregation.Id = check.ID()
 			arg.Aggregation.CreatedAt = check.CreatedAt()

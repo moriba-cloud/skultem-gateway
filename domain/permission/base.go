@@ -3,12 +3,13 @@ package permission
 import (
 	"context"
 	"github.com/moriba-build/ose/ddd"
+	"github.com/moriba-cloud/skultem-gateway/domain/core"
 )
 
 type (
 	Domain struct {
 		*ddd.Aggregation
-		feature string
+		feature core.Reference
 		create  bool
 		read    bool
 		readAll bool
@@ -17,7 +18,7 @@ type (
 	}
 	Args struct {
 		Aggregation ddd.AggregationArgs
-		Feature     string
+		Feature     core.Reference
 		Create      bool
 		Read        bool
 		ReadAll     bool
@@ -35,7 +36,7 @@ type (
 	}
 )
 
-func (d *Domain) Feature() string {
+func (d *Domain) Feature() core.Reference {
 	return d.feature
 }
 
