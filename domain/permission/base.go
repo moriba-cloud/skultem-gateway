@@ -1,15 +1,14 @@
-package role
+package permission
 
 import (
 	"context"
 	"github.com/moriba-build/ose/ddd"
-	"github.com/moriba-cloud/skultem-gateway/domain/core"
 )
 
 type (
 	Domain struct {
 		*ddd.Aggregation
-		role    string
+		feature string
 		create  bool
 		read    bool
 		readAll bool
@@ -18,6 +17,7 @@ type (
 	}
 	Args struct {
 		Aggregation ddd.AggregationArgs
+		Feature     string
 		Create      bool
 		Read        bool
 		ReadAll     bool
@@ -25,21 +25,17 @@ type (
 		Delete      bool
 	}
 	App interface {
-		New(ctx context.Context, args Args) (*ddd.Response[Domain], error)
-		ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[Domain], error)
-		List(ctx context.Context) (*ddd.Response[core.Option], error)
-		Update(ctx context.Context, args Args) (*ddd.Response[Domain], error)
-		Remove(ctx context.Context, id string) (*ddd.Response[Domain], error)
+		Update(ctx context.Context, args []*Args, role string) (*ddd.Response[Domain], error)
 	}
 	Repo interface {
-		Save(args Domain) (*Domain, error)
-		Check(name string) (*Domain, error)
-		FindById(id string) (*Domain, error)
-		ListByPage(args ddd.PaginationArgs) (*ddd.Response[Domain], error)
-		List() (*ddd.Response[core.Option], error)
-		Remove(args Domain) (*Domain, error)
+		Save(args []*Domain, roleId string) (*ddd.Response[Domain], error)
+		Check(feature string, role string) (*Domain, error)
 	}
 )
+
+func (d *Domain) Feature() string {
+	return d.feature
+}
 
 func (d *Domain) Create() bool {
 	return d.create
@@ -65,10 +61,13 @@ func (d *Domain) Update(args Args) error {
 	if err := validation(args); err != nil {
 		return err
 	}
+
+	d.feature = args.Feature
 	d.create = args.Create
 	d.readAll = args.ReadAll
 	d.read = args.Read
 	d.edit = args.Edit
 	d.delete = args.Delete
+
 	return nil
 }

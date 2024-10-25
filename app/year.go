@@ -15,7 +15,7 @@ type (
 		bus    year.Bus
 		logger *zap.Logger
 	}
-	yArgs struct {
+	argsYear struct {
 		Bus    year.Bus
 		Repo   year.Repo
 		Logger *zap.Logger
@@ -67,7 +67,7 @@ func (a aYear) Active(ctx context.Context, args ddd.FindByArgs) (*ddd.Response[y
 	panic("implement me")
 }
 
-func NewYear(args yArgs) year.App {
+func NewYear(args argsYear) year.App {
 	return &aYear{
 		repo:   args.Repo,
 		logger: args.Logger,

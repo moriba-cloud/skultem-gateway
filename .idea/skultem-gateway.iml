@@ -6,6 +6,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="devops" />
-    <orderEntry type="module" module-name="school-time-academic" />
+    <orderEntry type="module" module-name="skultem-management" />
   </component>
 </module>

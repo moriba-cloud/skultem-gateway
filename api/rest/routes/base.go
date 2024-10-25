@@ -79,4 +79,5 @@ func Routes(args Args) {
 	YearRoute(route, args.Apps.Year, args.Logger)
 	FeatureRoute(route, args.Apps.Feature, args.Logger)
 	RoleRoute(route, args.Apps.Role, args.Logger)
+	PermissionRoute(route, args.Apps.Permission, args.Logger)
 }
