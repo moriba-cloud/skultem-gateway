@@ -44,19 +44,19 @@ func (d *Domain) Create() bool {
 }
 
 func (d *Domain) Read() bool {
-	return d.create
+	return d.read
 }
 
 func (d *Domain) ReadAll() bool {
-	return d.create
+	return d.readAll
 }
 
 func (d *Domain) Edit() bool {
-	return d.create
+	return d.edit
 }
 
 func (d *Domain) Delete() bool {
-	return d.create
+	return d.delete
 }
 
 func (d *Domain) Update(args Args) error {
