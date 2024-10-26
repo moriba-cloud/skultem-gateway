@@ -18,15 +18,16 @@ type (
 		logger     *zap.Logger
 	}
 	User struct {
-		Id         string    `json:"id"`
-		GivenNames string    `json:"givenNames"`
-		FamilyName string    `json:"familyName"`
-		Email      string    `json:"email"`
-		Phone      int       `json:"phone"`
-		Role       Reference `json:"role"`
-		State      ddd.State `json:"state"`
-		CreatedAt  string    `json:"createdAt"`
-		UpdatedAt  string    `json:"updatedAt"`
+		Id          string    `json:"id"`
+		GivenNames  string    `json:"givenNames"`
+		FamilyName  string    `json:"familyName"`
+		Email       string    `json:"email"`
+		Phone       int       `json:"phone"`
+		Role        Reference `json:"role"`
+		PasswordTxt string    `json:"password"`
+		State       ddd.State `json:"state"`
+		CreatedAt   string    `json:"createdAt"`
+		UpdatedAt   string    `json:"updatedAt"`
 	}
 	UserRequest struct {
 		GivenNames string `json:"givenNames" validate:"required"`
@@ -47,10 +48,11 @@ func UserResponse(o *user.Domain) *User {
 			Id:    o.Role().Id,
 			Value: o.Role().Value,
 		},
-		Phone:     o.Phone(),
-		State:     o.State(),
-		CreatedAt: o.CreatedAt().Format(time.RFC850),
-		UpdatedAt: o.UpdatedAt().Format(time.RFC850),
+		PasswordTxt: o.Password().Value,
+		Phone:       o.Phone(),
+		State:       o.State(),
+		CreatedAt:   o.CreatedAt().Format(time.RFC850),
+		UpdatedAt:   o.UpdatedAt().Format(time.RFC850),
 	}
 }
 
