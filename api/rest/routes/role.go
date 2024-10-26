@@ -17,12 +17,13 @@ type (
 		logger     *zap.Logger
 	}
 	Role struct {
-		Id          string    `json:"id"`
-		Name        string    `json:"name"`
-		Description string    `json:"description"`
-		State       ddd.State `json:"state"`
-		CreatedAt   string    `json:"createdAt"`
-		UpdatedAt   string    `json:"updatedAt"`
+		Id          string       `json:"id"`
+		Name        string       `json:"name"`
+		Description string       `json:"description"`
+		Permissions []Permission `json:"permissions"`
+		State       ddd.State    `json:"state"`
+		CreatedAt   string       `json:"createdAt"`
+		UpdatedAt   string       `json:"updatedAt"`
 	}
 	RoleRequest struct {
 		Name        string `json:"name" validate:"required"`
@@ -31,10 +32,30 @@ type (
 )
 
 func RoleResponse(o *role.Domain) *Role {
+	permissions := make([]Permission, len(o.Permissions()))
+	for i, p := range o.Permissions() {
+		permissions[i] = Permission{
+			Id: p.ID(),
+			Feature: Reference{
+				Id:    p.Feature().Id,
+				Value: p.Feature().Value,
+			},
+			Create:    p.Create(),
+			ReadAll:   p.ReadAll(),
+			Read:      p.Read(),
+			Edit:      p.Edit(),
+			Delete:    p.Delete(),
+			State:     p.State(),
+			CreatedAt: o.CreatedAt().Format(time.RFC850),
+			UpdatedAt: o.UpdatedAt().Format(time.RFC850),
+		}
+	}
+
 	return &Role{
 		Id:          o.ID(),
 		Name:        o.Name(),
 		Description: o.Description(),
+		Permissions: permissions,
 		State:       o.State(),
 		CreatedAt:   o.CreatedAt().Format(time.RFC850),
 		UpdatedAt:   o.UpdatedAt().Format(time.RFC850),
