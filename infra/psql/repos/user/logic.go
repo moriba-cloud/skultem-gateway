@@ -49,6 +49,22 @@ func (m *model) FindById(id string) (*ddd.Response[user.Domain], error) {
 	}), nil
 }
 
+func (m *model) FindByEmail(email string) (*ddd.Response[user.Domain], error) {
+	var model User
+	if err := m.db.Preload("Role").Where(&User{Email: email}).First(&model).Error; err != nil {
+		return nil, err
+	}
+
+	record, err := model.Domain()
+	if err != nil {
+		return nil, err
+	}
+
+	return ddd.NewResponse(ddd.ResponseArgs[user.Domain]{
+		Record: record,
+	}), nil
+}
+
 func (m *model) ListByPage(args ddd.PaginationArgs) (*ddd.Response[user.Domain], error) {
 	records := make([]*user.Domain, 0)
 	models := make([]*User, 0)

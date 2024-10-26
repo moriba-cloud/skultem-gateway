@@ -20,6 +20,33 @@ type (
 	}
 )
 
+func (a aUser) Login(ctx context.Context, args user.AuthArgs) (*ddd.Response[user.Domain], error) {
+
+	res, err := a.repo.FindByEmail(args.Email)
+	if err != nil {
+		return nil, fmt.Errorf("no account found for this email: %s", args.Email)
+	}
+	record := res.Record()
+
+	if match := core.CheckPassword(record.Password().Hash, args.Password); !match {
+		return nil, fmt.Errorf("try again this password id incorrect")
+	}
+
+	err = record.AccessToken()
+	if err != nil {
+		return nil, err
+	}
+
+	err = record.RefreshToken()
+	if err != nil {
+		return nil, err
+	}
+
+	return ddd.NewResponse(ddd.ResponseArgs[user.Domain]{
+		Record: record,
+	}), nil
+}
+
 func (a aUser) New(ctx context.Context, args user.Args) (*ddd.Response[user.Domain], error) {
 	o, err := user.New(args)
 	if err != nil {

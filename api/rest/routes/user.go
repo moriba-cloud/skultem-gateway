@@ -199,10 +199,10 @@ func UserRoute(api fiber.Router, app user.App, logger *zap.Logger) {
 		logger:     logger,
 	}
 
-	router := api.Group("/user")
-	router.Get("", r.listByPage)
-	router.Get("/option", r.list)
-	router.Post("", r.new)
-	router.Patch("/:id", r.update)
-	router.Delete("/:id", r.remove)
+	api.Group("/user").
+		Get("", r.listByPage).
+		Get("/option", r.list).
+		Post("", r.new).
+		Patch("/:id", r.update).
+		Delete("/:id", r.remove)
 }

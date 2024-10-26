@@ -3,6 +3,7 @@ package rest
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/moriba-build/ose/ddd/config"
 	"github.com/moriba-build/ose/ddd/rest"
 	"github.com/moriba-build/ose/ddd/rest/exception"
 	"github.com/moriba-cloud/skultem-gateway/api/rest/routes"
@@ -18,9 +19,11 @@ type (
 )
 
 func Api(args Args) {
+	x := config.NewEnvs().EnvStr("X_HEADER")
+
 	api := rest.New(fiber.Config{
 		AppName:       "skultem",
-		ServerHeader:  "x-skultem-gateway",
+		ServerHeader:  x,
 		StrictRouting: true,
 		CaseSensitive: true,
 		UnescapePath:  true,

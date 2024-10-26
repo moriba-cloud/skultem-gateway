@@ -61,3 +61,9 @@ func GeneratePassword() (*Password, error) {
 		State: CHANGE,
 	}, err
 }
+
+func CheckPassword(hash string, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	fmt.Println()
+	return err == nil
+}
