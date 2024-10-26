@@ -33,11 +33,12 @@ func (a apiUser) login(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, err.Error())
 	}
 
-	record := res.Record()
-	c.Set("access-token", record.Access())
-	c.Set("refresh-token", record.Refresh())
+	record := UserResponse(res.Record())
+	record.AccessToken = res.Record().Access()
+	record.RefreshToken = res.Record().Access()
+
 	return c.JSON(dto.NewResponse(dto.ResponseArgs[User]{
-		Record: UserResponse(record),
+		Record: record,
 	}))
 }
 

@@ -18,16 +18,18 @@ type (
 		logger     *zap.Logger
 	}
 	User struct {
-		Id          string    `json:"id"`
-		GivenNames  string    `json:"givenNames"`
-		FamilyName  string    `json:"familyName"`
-		Email       string    `json:"email"`
-		Phone       int       `json:"phone"`
-		Role        Reference `json:"role"`
-		PasswordTxt string    `json:"password"`
-		State       ddd.State `json:"state"`
-		CreatedAt   string    `json:"createdAt"`
-		UpdatedAt   string    `json:"updatedAt"`
+		Id           string    `json:"id"`
+		GivenNames   string    `json:"givenNames"`
+		FamilyName   string    `json:"familyName"`
+		Email        string    `json:"email"`
+		Phone        int       `json:"phone"`
+		Role         Reference `json:"role"`
+		PasswordTxt  string    `json:"password"`
+		AccessToken  string    `json:"accessToken"`
+		RefreshToken string    `json:"refreshToken"`
+		State        ddd.State `json:"state"`
+		CreatedAt    string    `json:"createdAt"`
+		UpdatedAt    string    `json:"updatedAt"`
 	}
 	UserRequest struct {
 		GivenNames string `json:"givenNames" validate:"required"`

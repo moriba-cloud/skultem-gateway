@@ -127,7 +127,7 @@ func (d *Domain) AccessToken() error {
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["authorized"] = true
-	claims["email"] = d.email
+	claims["id"] = d.ID()
 	claims["role"] = d.role.Id
 	claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
 
@@ -146,9 +146,9 @@ func (d *Domain) RefreshToken() error {
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["authorized"] = true
-	claims["email"] = d.email
+	claims["id"] = d.ID()
 	claims["role"] = d.role.Id
-	claims["exp"] = time.Now().Add((time.Hour * 24) * 7).Unix()
+	claims["exp"] = time.Now().Add(time.Hour * 8).Unix()
 
 	refresh, err := token.SignedString(mySigningKey)
 	if err != nil {
