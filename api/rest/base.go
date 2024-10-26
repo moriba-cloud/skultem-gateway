@@ -7,7 +7,6 @@ import (
 	"github.com/moriba-build/ose/ddd/rest"
 	"github.com/moriba-build/ose/ddd/rest/exception"
 	"github.com/moriba-cloud/skultem-gateway/api/rest/routes"
-	"github.com/moriba-cloud/skultem-gateway/api/rest/routes/middlewares"
 	"github.com/moriba-cloud/skultem-gateway/app"
 	"go.uber.org/zap"
 )
@@ -32,7 +31,6 @@ func Api(args Args) {
 	})
 
 	api.Api().Use(cors.New())
-	api.Api().Use(middlewares.Auth)
 	routes.Routes(routes.Args{
 		Route:  api.Api(),
 		Apps:   args.Apps,

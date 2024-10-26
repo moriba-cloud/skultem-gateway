@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-build/ose/ddd/config"
 	core2 "github.com/moriba-build/ose/ddd/core"
@@ -123,13 +123,14 @@ func (d *Domain) ForgetPassword() error {
 func (d *Domain) AccessToken() error {
 	secret := config.NewEnvs().EnvStr("SECRET_KEY")
 	var mySigningKey = []byte(secret)
+
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["authorized"] = true
 	claims["id"] = d.ID()
 	claims["role"] = d.role.Id
-	claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+	claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
 
 	access, err := token.SignedString(mySigningKey)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/routes/middlewares"
 	"github.com/moriba-cloud/skultem-gateway/domain/feature"
 	"go.uber.org/zap"
 	"time"
@@ -175,9 +176,9 @@ func FeatureRoute(api fiber.Router, app feature.App, logger *zap.Logger) {
 	}
 
 	router := api.Group("/feature")
-	router.Get("", r.listByPage)
-	router.Get("/option", r.list)
-	router.Post("", r.new)
-	router.Patch("/:id", r.update)
-	router.Delete("/:id", r.remove)
+	router.Get("", middlewares.Auth, r.listByPage)
+	router.Get("/option", middlewares.Auth, r.list)
+	router.Post("", middlewares.Auth, r.new)
+	router.Patch("/:id", middlewares.Auth, r.update)
+	router.Delete("/:id", middlewares.Auth, r.remove)
 }
