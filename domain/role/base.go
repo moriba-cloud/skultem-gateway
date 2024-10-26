@@ -19,6 +19,7 @@ type (
 	}
 	App interface {
 		New(ctx context.Context, args Args) (*ddd.Response[Domain], error)
+		FindById(id string) (*ddd.Response[Domain], error)
 		ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[Domain], error)
 		List(ctx context.Context) (*ddd.Response[core.Option], error)
 		Update(ctx context.Context, args Args) (*ddd.Response[Domain], error)

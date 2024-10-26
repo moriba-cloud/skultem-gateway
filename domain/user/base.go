@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/moriba-build/ose/ddd"
+	core2 "github.com/moriba-build/ose/ddd/core"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
 )
 
@@ -35,13 +36,15 @@ type (
 		FindById(ctx context.Context, id string) (*ddd.Response[Domain], error)
 		List(ctx context.Context) (*ddd.Response[core.Option], error)
 		ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[Domain], error)
+		Remove(id string) (*ddd.Response[Domain], error)
 	}
 	Repo interface {
 		Save(args Domain) (*Domain, error)
-		FindById(id string) (*Domain, error)
+		FindById(id string) (*ddd.Response[Domain], error)
 		Check(phone int) (*Domain, error)
 		List() (*ddd.Response[core.Option], error)
 		ListByPage(args ddd.PaginationArgs) (*ddd.Response[Domain], error)
+		Remove(args Domain) (*Domain, error)
 	}
 )
 
@@ -69,13 +72,19 @@ func (d *Domain) Password() core.Password {
 	return d.password
 }
 
-func (d *Domain) Update() error {
-	password, err := core.GeneratePassword()
+func (d *Domain) Update(args Args) error {
+	phone, err := core2.NewPhone(args.Phone)
 	if err != nil {
 		return err
 	}
 
-	d.password = *password
+	d.givenNames = args.GivenNames
+	d.familyName = args.FamilyName
+	d.phone = phone.Phone()
+	d.email = args.Email
+	d.role = args.Role
+	d.password = args.Password
+
 	return nil
 }
 

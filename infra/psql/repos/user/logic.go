@@ -29,15 +29,24 @@ func (m *model) Check(phone int) (*user.Domain, error) {
 	if err := m.db.Where(&User{Phone: phone}).First(&model).Error; err != nil {
 		return nil, err
 	}
+
 	return model.Domain()
 }
 
-func (m *model) FindById(id string) (*user.Domain, error) {
+func (m *model) FindById(id string) (*ddd.Response[user.Domain], error) {
 	var model User
 	if err := m.db.Where(&User{ID: id}).First(&model).Error; err != nil {
 		return nil, err
 	}
-	return model.Domain()
+
+	record, err := model.Domain()
+	if err != nil {
+		return nil, err
+	}
+
+	return ddd.NewResponse(ddd.ResponseArgs[user.Domain]{
+		Record: record,
+	}), nil
 }
 
 func (m *model) ListByPage(args ddd.PaginationArgs) (*ddd.Response[user.Domain], error) {

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
-	"github.com/moriba-cloud/skultem-gateway/domain/role"
 	"github.com/moriba-cloud/skultem-gateway/domain/user"
 	"go.uber.org/zap"
 )
@@ -41,6 +40,26 @@ func (a aUser) New(ctx context.Context, args user.Args) (*ddd.Response[user.Doma
 	}), nil
 }
 
+func (a aUser) FindById(ctx context.Context, id string) (*ddd.Response[user.Domain], error) {
+	return a.repo.FindById(id)
+}
+
+func (a aUser) Remove(id string) (*ddd.Response[user.Domain], error) {
+	record, err := a.repo.FindById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	record, err = a.repo.Remove(*record)
+	if err != nil {
+		return nil, err
+	}
+
+	return ddd.NewResponse(ddd.ResponseArgs[user.Domain]{
+		Record: record,
+	}), nil
+}
+
 func (a aUser) Update(ctx context.Context, args user.Args) (*ddd.Response[user.Domain], error) {
 	record, err := a.repo.FindById(args.Aggregation.Id)
 	if err != nil {
@@ -59,12 +78,12 @@ func (a aUser) Update(ctx context.Context, args user.Args) (*ddd.Response[user.D
 	}
 	record, err = a.repo.Save(*record)
 
-	return ddd.NewResponse(ddd.ResponseArgs[role.Domain]{
+	return ddd.NewResponse(ddd.ResponseArgs[user.Domain]{
 		Record: record,
 	}), nil
 }
 
-func (a aUser) ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[role.Domain], error) {
+func (a aUser) ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[user.Domain], error) {
 	return a.repo.ListByPage(args)
 }
 
@@ -72,23 +91,7 @@ func (a aUser) List(ctx context.Context) (*ddd.Response[core.Option], error) {
 	return a.repo.List()
 }
 
-func (a aUser) Remove(ctx context.Context, id string) (*ddd.Response[role.Domain], error) {
-	record, err := a.repo.FindById(id)
-	if err != nil {
-		return nil, err
-	}
-
-	record, err = a.repo.Remove(*record)
-	if err != nil {
-		return nil, err
-	}
-
-	return ddd.NewResponse(ddd.ResponseArgs[role.Domain]{
-		Record: record,
-	}), nil
-}
-
-func NewRole(args argsRole) role.App {
+func NewUser(args argsUser) user.App {
 	return &aUser{
 		repo:   args.Repo,
 		logger: args.Logger,
