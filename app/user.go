@@ -26,7 +26,7 @@ func (a aUser) New(ctx context.Context, args user.Args) (*ddd.Response[user.Doma
 		return nil, err
 	}
 
-	if _, err := a.repo.Check(o.Phone()); err == nil {
+	if _, err := a.repo.Check(o.Phone(), o.Email()); err == nil {
 		return nil, fmt.Errorf("user with this phone: %d already exists", o.Phone())
 	}
 
@@ -67,7 +67,7 @@ func (a aUser) Update(ctx context.Context, args user.Args) (*ddd.Response[user.D
 	}
 	record := check.Record()
 
-	if check, _ := a.repo.Check(args.Phone); check != nil {
+	if check, _ := a.repo.Check(args.Phone, args.Email); check != nil {
 		if check.ID() != record.ID() {
 			return nil, fmt.Errorf("user with this phone: %d already exists", args.Phone)
 		}

@@ -29,7 +29,7 @@ type (
 		UpdatedAt  string    `json:"updatedAt"`
 	}
 	UserRequest struct {
-		GiveNames  string `json:"giveNames" validate:"required"`
+		GivenNames string `json:"givenNames" validate:"required"`
 		FamilyName string `json:"familyName" validate:"required"`
 		Phone      int    `json:"phone" validate:"required"`
 		Email      string `json:"email" validate:"email"`
@@ -116,7 +116,7 @@ func (a apiUser) new(c *fiber.Ctx) error {
 	}
 
 	res, err := a.app.New(c.Context(), user.Args{
-		GivenNames: payload.GiveNames,
+		GivenNames: payload.GivenNames,
 		FamilyName: payload.FamilyName,
 		Phone:      payload.Phone,
 		Email:      payload.Email,
@@ -154,7 +154,7 @@ func (a apiUser) update(c *fiber.Ctx) error {
 		Aggregation: ddd.AggregationArgs{
 			Id: byId.Id,
 		},
-		GivenNames: payload.GiveNames,
+		GivenNames: payload.GivenNames,
 		FamilyName: payload.FamilyName,
 		Phone:      payload.Phone,
 		Email:      payload.Email,
@@ -197,7 +197,7 @@ func UserRoute(api fiber.Router, app user.App, logger *zap.Logger) {
 		logger:     logger,
 	}
 
-	router := api.Group("/feature")
+	router := api.Group("/user")
 	router.Get("", r.listByPage)
 	router.Get("/option", r.list)
 	router.Post("", r.new)

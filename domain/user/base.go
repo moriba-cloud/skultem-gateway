@@ -42,7 +42,7 @@ type (
 	Repo interface {
 		Save(args Domain) (*Domain, error)
 		FindById(id string) (*ddd.Response[Domain], error)
-		Check(phone int) (*Domain, error)
+		Check(phone int, email string) (*Domain, error)
 		List() (*ddd.Response[core.Option], error)
 		ListByPage(args ddd.PaginationArgs) (*ddd.Response[Domain], error)
 		Remove(args Domain) (*Domain, error)

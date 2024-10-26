@@ -17,16 +17,16 @@ type model struct {
 
 func (m *model) Save(args user.Domain) (*user.Domain, error) {
 	model := Model(&args)
-	if err := m.db.Save(model).Error; err != nil {
+	if err := m.db.Preload("Role").Save(model).Error; err != nil {
 		return nil, err
 	}
 	m.logger.Info(fmt.Sprintf("saved user with id: %s", model.ID))
 	return model.Domain()
 }
 
-func (m *model) Check(phone int) (*user.Domain, error) {
+func (m *model) Check(phone int, email string) (*user.Domain, error) {
 	var model User
-	if err := m.db.Where(&User{Phone: phone}).First(&model).Error; err != nil {
+	if err := m.db.Where("phone = ? or email = ?", phone, email).First(&model).Error; err != nil {
 		return nil, err
 	}
 
@@ -35,7 +35,7 @@ func (m *model) Check(phone int) (*user.Domain, error) {
 
 func (m *model) FindById(id string) (*ddd.Response[user.Domain], error) {
 	var model User
-	if err := m.db.Where(&User{ID: id}).First(&model).Error; err != nil {
+	if err := m.db.Preload("Role").Where(&User{ID: id}).First(&model).Error; err != nil {
 		return nil, err
 	}
 
@@ -57,7 +57,7 @@ func (m *model) ListByPage(args ddd.PaginationArgs) (*ddd.Response[user.Domain],
 		Page:  args.Page,
 	})
 
-	m.db.Scopes(p.Paginate(m.db)).Find(&models)
+	m.db.Preload("Role").Scopes(p.Paginate(m.db)).Find(&models)
 	for _, record := range models {
 		d, err := record.Domain()
 		if err != nil {
