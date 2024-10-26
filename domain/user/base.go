@@ -34,9 +34,10 @@ type (
 	App interface {
 		New(ctx context.Context, args Args) (*ddd.Response[Domain], error)
 		FindById(ctx context.Context, id string) (*ddd.Response[Domain], error)
+		Update(ctx context.Context, args Args) (*ddd.Response[Domain], error)
 		List(ctx context.Context) (*ddd.Response[core.Option], error)
 		ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[Domain], error)
-		Remove(id string) (*ddd.Response[Domain], error)
+		Remove(ctx context.Context, id string) (*ddd.Response[Domain], error)
 	}
 	Repo interface {
 		Save(args Domain) (*Domain, error)

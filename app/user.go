@@ -44,13 +44,13 @@ func (a aUser) FindById(ctx context.Context, id string) (*ddd.Response[user.Doma
 	return a.repo.FindById(id)
 }
 
-func (a aUser) Remove(id string) (*ddd.Response[user.Domain], error) {
-	record, err := a.repo.FindById(id)
+func (a aUser) Remove(ctx context.Context, id string) (*ddd.Response[user.Domain], error) {
+	domain, err := a.repo.FindById(id)
 	if err != nil {
 		return nil, err
 	}
 
-	record, err = a.repo.Remove(*record)
+	record, err := a.repo.Remove(*domain.Record())
 	if err != nil {
 		return nil, err
 	}
@@ -61,10 +61,11 @@ func (a aUser) Remove(id string) (*ddd.Response[user.Domain], error) {
 }
 
 func (a aUser) Update(ctx context.Context, args user.Args) (*ddd.Response[user.Domain], error) {
-	record, err := a.repo.FindById(args.Aggregation.Id)
+	check, err := a.repo.FindById(args.Aggregation.Id)
 	if err != nil {
 		return nil, err
 	}
+	record := check.Record()
 
 	if check, _ := a.repo.Check(args.Phone); check != nil {
 		if check.ID() != record.ID() {

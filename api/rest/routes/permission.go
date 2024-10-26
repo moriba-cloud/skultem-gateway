@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	apiPermission struct {
+	argsPermissions struct {
 		validation *validation.Validation
 		app        permission.App
 		logger     *zap.Logger
@@ -60,7 +60,7 @@ func PermissionResponse(o *permission.Domain) *Permission {
 	}
 }
 
-func (a apiPermission) new(c *fiber.Ctx) error {
+func (a argsPermissions) new(c *fiber.Ctx) error {
 	payload := new(PermissionRequest)
 	if err := c.BodyParser(payload); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
@@ -105,7 +105,7 @@ func (a apiPermission) new(c *fiber.Ctx) error {
 	}))
 }
 
-func (a apiPermission) rolePermissions(c *fiber.Ctx) error {
+func (a argsPermissions) rolePermissions(c *fiber.Ctx) error {
 	byId := new(dto.ById)
 	if err := c.ParamsParser(byId); err != nil {
 		return err
@@ -129,7 +129,7 @@ func (a apiPermission) rolePermissions(c *fiber.Ctx) error {
 }
 
 func PermissionRoute(api fiber.Router, app permission.App, logger *zap.Logger) {
-	r := &apiPermission{
+	r := &argsPermissions{
 		app:        app,
 		validation: validation.NewValidation(),
 		logger:     logger,

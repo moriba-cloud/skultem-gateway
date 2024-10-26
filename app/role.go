@@ -5,20 +5,43 @@ import (
 	"fmt"
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
+	"github.com/moriba-cloud/skultem-gateway/domain/permission"
 	"github.com/moriba-cloud/skultem-gateway/domain/role"
 	"go.uber.org/zap"
 )
 
 type (
 	aRole struct {
-		repo   role.Repo
-		logger *zap.Logger
+		repo       role.Repo
+		permission permission.Repo
+		logger     *zap.Logger
 	}
 	argsRole struct {
-		Repo   role.Repo
-		Logger *zap.Logger
+		Repo       role.Repo
+		Permission permission.Repo
+		Logger     *zap.Logger
 	}
 )
+
+func (a aRole) FindById(ctx context.Context, id string) (*ddd.Response[role.Domain], error) {
+	record, err := a.repo.FindById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := a.permission.RolePermissions(id)
+	if err != nil {
+		return nil, err
+	}
+
+	record.Update(role.Args{
+		Permissions: res.Records(),
+	})
+
+	return ddd.NewResponse[role.Domain](ddd.ResponseArgs[role.Domain]{
+		Record: record,
+	}), nil
+}
 
 func (a aRole) New(ctx context.Context, args role.Args) (*ddd.Response[role.Domain], error) {
 	o, err := role.New(args)
@@ -52,10 +75,7 @@ func (a aRole) Update(ctx context.Context, args role.Args) (*ddd.Response[role.D
 		}
 	}
 
-	err = record.Update(args)
-	if err != nil {
-		return nil, err
-	}
+	record.Update(args)
 	record, err = a.repo.Save(*record)
 
 	return ddd.NewResponse(ddd.ResponseArgs[role.Domain]{
@@ -89,7 +109,8 @@ func (a aRole) Remove(ctx context.Context, id string) (*ddd.Response[role.Domain
 
 func NewRole(args argsRole) role.App {
 	return &aRole{
-		repo:   args.Repo,
-		logger: args.Logger,
+		repo:       args.Repo,
+		permission: args.Permission,
+		logger:     args.Logger,
 	}
 }

@@ -14,6 +14,7 @@ func New(args Args) (*Domain, error) {
 		Aggregation: ddd.NewAggregation(),
 		name:        args.Name,
 		description: args.Description,
+		permissions: args.Permissions,
 	}, nil
 }
 
@@ -31,6 +32,7 @@ func Existing(args Args) (*Domain, error) {
 		Aggregation: Aggregation,
 		name:        args.Name,
 		description: args.Description,
+		permissions: args.Permissions,
 	}, nil
 }
 

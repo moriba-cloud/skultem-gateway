@@ -80,4 +80,5 @@ func Routes(args Args) {
 	FeatureRoute(route, args.Apps.Feature, args.Logger)
 	RoleRoute(route, args.Apps.Role, args.Logger)
 	PermissionRoute(route, args.Apps.Permission, args.Logger)
+	UserRoute(route, args.Apps.User, args.Logger)
 }

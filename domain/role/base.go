@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
+	"github.com/moriba-cloud/skultem-gateway/domain/permission"
 )
 
 type (
@@ -11,15 +12,17 @@ type (
 		*ddd.Aggregation
 		name        string
 		description string
+		permissions []*permission.Domain
 	}
 	Args struct {
 		Aggregation ddd.AggregationArgs
 		Name        string
 		Description string
+		Permissions []*permission.Domain
 	}
 	App interface {
 		New(ctx context.Context, args Args) (*ddd.Response[Domain], error)
-		FindById(id string) (*ddd.Response[Domain], error)
+		FindById(ctx context.Context, id string) (*ddd.Response[Domain], error)
 		ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[Domain], error)
 		List(ctx context.Context) (*ddd.Response[core.Option], error)
 		Update(ctx context.Context, args Args) (*ddd.Response[Domain], error)
@@ -43,11 +46,18 @@ func (d *Domain) Description() string {
 	return d.description
 }
 
-func (d *Domain) Update(args Args) error {
-	if err := validation(args); err != nil {
-		return err
+func (d *Domain) Permissions() []*permission.Domain {
+	return d.permissions
+}
+
+func (d *Domain) Update(args Args) {
+	if len(args.Name) > 0 {
+		d.name = args.Name
 	}
-	d.name = args.Name
-	d.description = args.Description
-	return nil
+
+	if len(args.Description) > 0 {
+		d.description = args.Description
+	}
+
+	d.permissions = args.Permissions
 }

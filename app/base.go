@@ -4,6 +4,7 @@ import (
 	"github.com/moriba-cloud/skultem-gateway/domain/feature"
 	"github.com/moriba-cloud/skultem-gateway/domain/permission"
 	"github.com/moriba-cloud/skultem-gateway/domain/role"
+	"github.com/moriba-cloud/skultem-gateway/domain/user"
 	"github.com/moriba-cloud/skultem-gateway/domain/year"
 	"github.com/moriba-cloud/skultem-gateway/infra/management"
 	"github.com/moriba-cloud/skultem-gateway/infra/psql/repos"
@@ -16,6 +17,7 @@ type (
 		Feature    feature.App
 		Role       role.App
 		Permission permission.App
+		User       user.App
 	}
 	Args struct {
 		Repos  *repos.Repos
@@ -36,14 +38,19 @@ func NewApps(args Args) *Apps {
 			Logger: args.Logger,
 		}),
 		Role: NewRole(argsRole{
-			Repo:   args.Repos.Role,
-			Logger: args.Logger,
+			Repo:       args.Repos.Role,
+			Permission: args.Repos.Permission,
+			Logger:     args.Logger,
 		}),
 		Permission: NewPermission(argsPermission{
 			Repo:    args.Repos.Permission,
 			Role:    args.Repos.Role,
 			Feature: args.Repos.Feature,
 			Logger:  args.Logger,
+		}),
+		User: NewUser(argsUser{
+			Repo:   args.Repos.User,
+			Logger: args.Logger,
 		}),
 	}
 }

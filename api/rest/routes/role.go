@@ -148,6 +148,25 @@ func (a apiRole) update(c *fiber.Ctx) error {
 	}))
 }
 
+func (a apiRole) findById(c *fiber.Ctx) error {
+	payload := new(dto.ById)
+	if err := c.ParamsParser(payload); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	if err := a.validation.Run(payload); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	res, err := a.app.FindById(c.Context(), payload.Id)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(dto.NewResponse(dto.ResponseArgs[Role]{
+		Record: RoleResponse(res.Record()),
+	}))
+}
+
 func (a apiRole) remove(c *fiber.Ctx) error {
 	payload := new(dto.ById)
 	if err := c.ParamsParser(payload); err != nil {
@@ -177,6 +196,7 @@ func RoleRoute(api fiber.Router, app role.App, logger *zap.Logger) {
 	router := api.Group("/role")
 	router.Get("", r.listByPage)
 	router.Get("/option", r.list)
+	router.Get("/:id", r.findById)
 	router.Post("", r.new)
 	router.Patch("/:id", r.update)
 	router.Delete("/:id", r.remove)
