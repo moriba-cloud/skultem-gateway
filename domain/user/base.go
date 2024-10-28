@@ -3,12 +3,9 @@ package user
 import (
 	"context"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/moriba-build/ose/ddd"
-	"github.com/moriba-build/ose/ddd/config"
 	core2 "github.com/moriba-build/ose/ddd/core"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
-	"time"
 )
 
 type (
@@ -43,7 +40,6 @@ type (
 		Refresh     string
 	}
 	App interface {
-		Login(ctx context.Context, args AuthArgs) (*ddd.Response[Domain], error)
 		New(ctx context.Context, args Args) (*ddd.Response[Domain], error)
 		FindById(ctx context.Context, id string) (*ddd.Response[Domain], error)
 		Update(ctx context.Context, args Args) (*ddd.Response[Domain], error)
@@ -118,45 +114,6 @@ func (d *Domain) ForgetPassword() error {
 
 	d.password = *password
 	return nil
-}
-
-func (d *Domain) AccessToken() error {
-	secret := config.NewEnvs().EnvStr("SECRET_KEY")
-	var mySigningKey = []byte(secret)
-
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-
-	claims["authorized"] = true
-	claims["id"] = d.ID()
-	claims["role"] = d.role.Id
-	claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
-
-	access, err := token.SignedString(mySigningKey)
-	if err != nil {
-		return err
-	}
-	d.access = access
-	return err
-}
-
-func (d *Domain) RefreshToken() error {
-	secret := config.NewEnvs().EnvStr("SECRET_KEY")
-	var mySigningKey = []byte(secret)
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-
-	claims["authorized"] = true
-	claims["id"] = d.ID()
-	claims["role"] = d.role.Id
-	claims["exp"] = time.Now().Add(time.Hour * 8).Unix()
-
-	refresh, err := token.SignedString(mySigningKey)
-	if err != nil {
-		return err
-	}
-	d.refresh = refresh
-	return err
 }
 
 func (d *Domain) Reference() core.Reference {

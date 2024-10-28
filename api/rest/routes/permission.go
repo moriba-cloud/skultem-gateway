@@ -105,29 +105,6 @@ func (a argsPermissions) new(c *fiber.Ctx) error {
 	}))
 }
 
-func (a argsPermissions) rolePermissions(c *fiber.Ctx) error {
-	byId := new(dto.ById)
-	if err := c.ParamsParser(byId); err != nil {
-		return err
-	}
-	if err := a.validation.Run(byId); err != nil {
-		return err
-	}
-
-	res, err := a.app.RolePermissions(c.Context(), byId.Id)
-	if err != nil {
-		return fiber.NewError(fiber.StatusNotFound, err.Error())
-	}
-
-	records := make([]*Permission, 0)
-	for _, record := range res.Records() {
-		records = append(records, PermissionResponse(record))
-	}
-	return c.JSON(dto.NewResponse(dto.ResponseArgs[Permission]{
-		Records: records,
-	}))
-}
-
 func PermissionRoute(api fiber.Router, app permission.App, logger *zap.Logger) {
 	r := &argsPermissions{
 		app:        app,
@@ -137,5 +114,4 @@ func PermissionRoute(api fiber.Router, app permission.App, logger *zap.Logger) {
 
 	router := api.Group("/permission")
 	router.Post("/:id", r.new)
-	router.Get("/:id", r.rolePermissions)
 }

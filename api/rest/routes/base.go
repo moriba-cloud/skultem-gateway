@@ -22,7 +22,7 @@ type (
 	}
 	EducationRequest struct {
 		Qualification string `json:"qualification" validate:"required"`
-		School        string `json:"school" validate:"required"`
+		School        string `json:"config" validate:"required"`
 	}
 	Phone struct {
 		Id        string    `json:"id"`
@@ -43,7 +43,7 @@ type (
 	Education struct {
 		Id            string    `json:"id"`
 		Qualification string    `json:"qualification" validate:"required"`
-		School        string    `json:"school" validate:"required"`
+		School        string    `json:"config" validate:"required"`
 		State         ddd.State `json:"state"`
 		CreatedAt     string    `json:"createdAt"`
 		UpdatedAt     string    `json:"updatedAt"`
@@ -81,5 +81,5 @@ func Routes(args Args) {
 	RoleRoute(route, args.Apps.Role, args.Logger)
 	PermissionRoute(route, args.Apps.Permission, args.Logger)
 	UserRoute(route, args.Apps.User, args.Logger)
-	AuthRoute(route, args.Apps.User, args.Logger)
+	AuthRoute(route, args.Apps.Auth, args.Logger)
 }

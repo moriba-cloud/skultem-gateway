@@ -1,20 +1,42 @@
 package middlewares
 
 import (
-	jwtware "github.com/gofiber/contrib/jwt"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/moriba-build/ose/ddd/config"
+	"github.com/moriba-cloud/skultem-gateway/domain/auth"
+	"strings"
 )
 
-func Auth(c *fiber.Ctx) error {
-	return jwtware.New(jwtware.Config{
-		SigningKey: jwtware.SigningKey{Key: []byte(config.NewEnvs().EnvStr("SECRET_KEY"))},
-		ContextKey: "jwt",
-		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": true,
-				"msg":   err.Error(),
-			})
-		},
-	})(c)
+func AccessTokenGuard(c *fiber.Ctx) error {
+	if c.GetReqHeaders()["Authorization"] != nil {
+		authorization := c.GetReqHeaders()["Authorization"][0]
+		userToken := strings.Replace(authorization, "Bearer ", "", 1)
+		token, err := auth.VerifyAccessToken(userToken)
+		if err != nil {
+			return err
+		}
+
+		c.Set("user", token["id"].(string))
+		return c.Next()
+	}
+
+	return fmt.Errorf("missing authentication token")
+}
+
+func RefreshTokenGuard(c *fiber.Ctx) error {
+	if c.GetReqHeaders()["Authorization"] != nil {
+		authorization := c.GetReqHeaders()["Authorization"][0]
+		userToken := strings.Replace(authorization, "Bearer ", "", 1)
+		token, err := auth.VerifyRefreshToken(userToken)
+
+		if err != nil {
+			return err
+		}
+
+		c.Set("user", token["id"].(string))
+		c.Set("refresh", userToken)
+		return c.Next()
+	}
+
+	return fmt.Errorf("missing authentication token")
 }

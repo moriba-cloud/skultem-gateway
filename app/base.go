@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/moriba-cloud/skultem-gateway/domain/auth"
 	"github.com/moriba-cloud/skultem-gateway/domain/feature"
 	"github.com/moriba-cloud/skultem-gateway/domain/permission"
 	"github.com/moriba-cloud/skultem-gateway/domain/role"
@@ -18,6 +19,7 @@ type (
 		Role       role.App
 		Permission permission.App
 		User       user.App
+		Auth       auth.App
 	}
 	Args struct {
 		Repos  *repos.Repos
@@ -49,6 +51,10 @@ func NewApps(args Args) *Apps {
 			Logger:  args.Logger,
 		}),
 		User: NewUser(argsUser{
+			Repo:   args.Repos.User,
+			Logger: args.Logger,
+		}),
+		Auth: NewAuth(argsAuth{
 			Repo:   args.Repos.User,
 			Logger: args.Logger,
 		}),

@@ -69,10 +69,6 @@ func (a aPermission) Update(ctx context.Context, args []*permission.Args, role s
 	return a.repo.Save(permissions, role)
 }
 
-func (a aPermission) RolePermissions(ctx context.Context, role string) (*ddd.Response[permission.Domain], error) {
-	return a.repo.RolePermissions(role)
-}
-
 func NewPermission(args argsPermission) permission.App {
 	return &aPermission{
 		repo:    args.Repo,
