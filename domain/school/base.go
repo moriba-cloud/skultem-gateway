@@ -5,6 +5,7 @@ import (
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-build/ose/domain"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
+	"github.com/moriba-cloud/skultem-gateway/domain/user"
 )
 
 type (
@@ -15,6 +16,7 @@ type (
 	Domain struct {
 		*ddd.Aggregation
 		name     string
+		domain   string
 		email    string
 		region   string
 		chiefdom string
@@ -22,22 +24,20 @@ type (
 		city     string
 		street   string
 		phones   []domain.Phone
-		owner    core.Reference
-	}
-	AuthArgs struct {
-		Email    string
-		Password string
+		owner    *user.Domain
 	}
 	Args struct {
 		Aggregation ddd.AggregationArgs
 		Name        string
+		Domain      string
 		Email       string
 		Region      string
 		Chiefdom    string
 		District    string
 		City        string
 		Street      string
-		Phones      []string
+		Phones      []domain.PhoneArgs
+		Owner       user.Args
 	}
 	App interface {
 		New(ctx context.Context, args Args) (*ddd.Response[Domain], error)
@@ -48,10 +48,9 @@ type (
 		Remove(ctx context.Context, id string) (*ddd.Response[Domain], error)
 	}
 	Repo interface {
-		Save(args Domain) (*Domain, error)
+		Save(args Domain) (*ddd.Response[Domain], error)
 		FindById(id string) (*ddd.Response[Domain], error)
-		FindByEmail(email string) (*ddd.Response[Domain], error)
-		Check(phone int, email string) (*Domain, error)
+		Check(key string, value string) (*Domain, error)
 		List() (*ddd.Response[core.Option], error)
 		ListByPage(args ddd.PaginationArgs) (*ddd.Response[Domain], error)
 		Remove(args Domain) (*Domain, error)
@@ -60,6 +59,10 @@ type (
 
 func (d *Domain) Name() string {
 	return d.name
+}
+
+func (d *Domain) Domain() string {
+	return d.domain
 }
 
 func (d *Domain) Region() string {
@@ -82,8 +85,19 @@ func (d *Domain) Street() string {
 	return d.street
 }
 
-func (d *Domain) Owner() core.Reference {
+func (d *Domain) Email() string {
+	return d.email
+}
+
+func (d *Domain) Owner() *user.Domain {
 	return d.owner
+}
+
+func (d *Domain) Option() *core.Option {
+	return &core.Option{
+		Label: d.ID(),
+		Value: d.name,
+	}
 }
 
 func (d *Domain) Phones() []domain.Phone {

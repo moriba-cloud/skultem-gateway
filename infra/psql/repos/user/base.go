@@ -77,3 +77,24 @@ func Model(args *user.Domain) User {
 		UpdatedAt:      *args.UpdatedAt(),
 	}
 }
+
+func (u User) Args() (*user.Args, error) {
+	return &user.Args{
+		Aggregation: ddd.AggregationArgs{
+			Id:        u.ID,
+			State:     ddd.State(u.State),
+			CreatedAt: &u.CreatedAt,
+			UpdatedAt: &u.UpdatedAt,
+		},
+		GivenNames: u.GivenNames,
+		FamilyName: u.FamilyName,
+		Email:      u.Email,
+		Role:       u.Role.Reference(),
+		Password: core.Password{
+			Value: u.PasswordTxt,
+			Hash:  u.Password,
+			State: core.PasswordState(u.PasswordStatus),
+		},
+		Phone: u.Phone,
+	}, nil
+}

@@ -24,9 +24,18 @@ func (m *model) Save(args user.Domain) (*user.Domain, error) {
 	return model.Domain()
 }
 
-func (m *model) Check(phone int, email string) (*user.Domain, error) {
+func (m *model) CheckByEmail(email string) (*user.Domain, error) {
 	var model User
-	if err := m.db.Where("phone = ? or email = ?", phone, email).First(&model).Error; err != nil {
+	if err := m.db.Where("email = ?", email).First(&model).Error; err != nil {
+		return nil, err
+	}
+
+	return model.Domain()
+}
+
+func (m *model) CheckByPhone(phone int) (*user.Domain, error) {
+	var model User
+	if err := m.db.Where("phone = ?", phone).First(&model).Error; err != nil {
 		return nil, err
 	}
 

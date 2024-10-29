@@ -82,4 +82,5 @@ func Routes(args Args) {
 	PermissionRoute(route, args.Apps.Permission, args.Logger)
 	UserRoute(route, args.Apps.User, args.Logger)
 	AuthRoute(route, args.Apps.Auth, args.Logger)
+	SchoolRoute(route, args.Apps.School, args.Logger)
 }
