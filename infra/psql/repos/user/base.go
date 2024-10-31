@@ -18,7 +18,8 @@ type (
 		Email          string
 		Phone          int
 		Role           role.Role
-		RoleId         string
+		RoleId         string `gorm:"index"`
+		SchoolId       string
 		Password       string
 		PasswordTxt    string
 		PasswordStatus string
@@ -44,6 +45,7 @@ func (u User) Domain() (*user.Domain, error) {
 		GivenNames: u.GivenNames,
 		FamilyName: u.FamilyName,
 		Email:      u.Email,
+		School:     u.SchoolId,
 		Role:       u.Role.Reference(),
 		Password: core.Password{
 			Value: u.PasswordTxt,
@@ -69,6 +71,7 @@ func Model(args *user.Domain) User {
 		Email:          args.Email(),
 		Phone:          args.Phone(),
 		RoleId:         args.Role().Id,
+		SchoolId:       args.School(),
 		Password:       args.Password().Hash,
 		PasswordTxt:    args.Password().Value,
 		PasswordStatus: string(args.Password().State),
@@ -89,6 +92,7 @@ func (u User) Args() (*user.Args, error) {
 		GivenNames: u.GivenNames,
 		FamilyName: u.FamilyName,
 		Email:      u.Email,
+		School:     u.SchoolId,
 		Role:       u.Role.Reference(),
 		Password: core.Password{
 			Value: u.PasswordTxt,

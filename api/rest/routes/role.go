@@ -5,6 +5,7 @@ import (
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/middlewares"
 	"github.com/moriba-cloud/skultem-gateway/domain/role"
 	"go.uber.org/zap"
 	"time"
@@ -214,7 +215,7 @@ func RoleRoute(api fiber.Router, app role.App, logger *zap.Logger) {
 		logger:     logger,
 	}
 
-	router := api.Group("/role")
+	router := api.Group("/role", middlewares.AccessTokenGuard)
 	router.Get("", r.listByPage)
 	router.Get("/option", r.list)
 	router.Get("/:id", r.findById)

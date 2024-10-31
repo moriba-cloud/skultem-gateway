@@ -21,6 +21,9 @@ type (
 )
 
 func (a aUser) New(ctx context.Context, args user.Args) (*ddd.Response[user.Domain], error) {
+	school := core.GetContextValue(ctx, "school")
+	args.School = school
+
 	o, err := user.New(args)
 	if err != nil {
 		return nil, err
@@ -89,7 +92,8 @@ func (a aUser) Update(ctx context.Context, args user.Args) (*ddd.Response[user.D
 }
 
 func (a aUser) ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[user.Domain], error) {
-	return a.repo.ListByPage(args)
+	school := core.GetContextValue(ctx, "school")
+	return a.repo.ListByPage(args, school)
 }
 
 func (a aUser) List(ctx context.Context) (*ddd.Response[core.Option], error) {

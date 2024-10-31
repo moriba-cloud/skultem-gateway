@@ -44,6 +44,9 @@ func (a aRole) FindById(ctx context.Context, id string) (*ddd.Response[role.Doma
 }
 
 func (a aRole) New(ctx context.Context, args role.Args) (*ddd.Response[role.Domain], error) {
+	school := core.GetContextValue(ctx, "school")
+	args.School = school
+
 	o, err := role.New(args)
 	if err != nil {
 		return nil, err
@@ -84,7 +87,8 @@ func (a aRole) Update(ctx context.Context, args role.Args) (*ddd.Response[role.D
 }
 
 func (a aRole) ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[role.Domain], error) {
-	return a.repo.ListByPage(args)
+	school := core.GetContextValue(ctx, "school")
+	return a.repo.ListByPage(args, school)
 }
 
 func (a aRole) List(ctx context.Context) (*ddd.Response[core.Option], error) {

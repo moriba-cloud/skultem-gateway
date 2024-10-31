@@ -74,7 +74,7 @@ func (m *model) FindByEmail(email string) (*ddd.Response[user.Domain], error) {
 	}), nil
 }
 
-func (m *model) ListByPage(args ddd.PaginationArgs) (*ddd.Response[user.Domain], error) {
+func (m *model) ListByPage(args ddd.PaginationArgs, school string) (*ddd.Response[user.Domain], error) {
 	records := make([]*user.Domain, 0)
 	models := make([]*User, 0)
 	p := psql.NewPagination[User](psql.PaginationArgs{
@@ -82,7 +82,11 @@ func (m *model) ListByPage(args ddd.PaginationArgs) (*ddd.Response[user.Domain],
 		Page:  args.Page,
 	})
 
-	m.db.Preload("Role").Scopes(p.Paginate(m.db)).Find(&models)
+	m.db.Preload("Role").
+		Where("school_id = ?", school).
+		Scopes(p.Paginate(m.db)).
+		Find(&models)
+
 	for _, record := range models {
 		d, err := record.Domain()
 		if err != nil {

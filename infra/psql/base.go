@@ -25,8 +25,8 @@ func Database(logger *zap.Logger) *repos.Repos {
 
 func migrate(db *gorm.DB) {
 	err := db.AutoMigrate(
-		&feature.Feature{}, &role.Role{}, &permission.Permission{}, &user.User{},
-		&school.School{}, &school.Phone{},
+		&feature.Feature{}, &role.Role{}, &permission.Permission{}, &school.School{},
+		&school.Phone{}, &user.User{},
 	)
 	if err != nil {
 		panic(err)

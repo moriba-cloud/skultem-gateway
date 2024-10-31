@@ -15,6 +15,7 @@ func New(args Args) (*Domain, error) {
 		name:        args.Name,
 		description: args.Description,
 		permissions: args.Permissions,
+		school:      args.School,
 	}, nil
 }
 
@@ -33,6 +34,7 @@ func Existing(args Args) (*Domain, error) {
 		name:        args.Name,
 		description: args.Description,
 		permissions: args.Permissions,
+		school:      args.School,
 	}, nil
 }
 

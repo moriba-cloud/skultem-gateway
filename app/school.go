@@ -33,25 +33,18 @@ func (a aSchool) New(ctx context.Context, args school.Args) (*ddd.Response[schoo
 		return nil, fmt.Errorf("school already exist with this domain: %s", args.Domain)
 	}
 
-	if _, err := a.user.CheckByPhone(args.Owner.Phone); err == nil {
-		return nil, fmt.Errorf("owner already exist with this phone: %d", args.Owner.Phone)
+	owner := args.Users[0]
+	if _, err := a.user.CheckByPhone(owner.Phone); err == nil {
+		return nil, fmt.Errorf("owner already exist with this phone: %d", owner.Phone)
 	}
 
-	if _, err := a.user.CheckByEmail(args.Owner.Email); err == nil {
-		return nil, fmt.Errorf("owner already exist with this email: %s", args.Owner.Email)
+	if _, err := a.user.CheckByEmail(owner.Email); err == nil {
+		return nil, fmt.Errorf("owner already exist with this email: %s", owner.Email)
 	}
 
 	role := config.NewEnvs().EnvStr("OWNER_ROLE")
-	owner := user.Args{
-		GivenNames: args.Owner.GivenNames,
-		FamilyName: args.Owner.FamilyName,
-		Phone:      args.Owner.Phone,
-		Email:      args.Owner.Email,
-		Role: core.Reference{
-			Id: role,
-		},
-	}
-	args.Owner = owner
+	owner.Role.Id = role
+	args.Users[0] = owner
 
 	o, err := school.New(args)
 	if err != nil {

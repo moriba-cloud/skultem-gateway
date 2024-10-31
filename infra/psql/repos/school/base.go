@@ -5,6 +5,7 @@ import (
 	ose "github.com/moriba-build/ose/domain"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
 	"github.com/moriba-cloud/skultem-gateway/domain/school"
+	domainUser "github.com/moriba-cloud/skultem-gateway/domain/user"
 	"github.com/moriba-cloud/skultem-gateway/infra/psql/repos/user"
 	"time"
 )
@@ -21,9 +22,8 @@ type (
 		City      string
 		Street    string
 		State     string
-		OwnerId   string
 		Phones    []Phone
-		Owner     user.User
+		Users     []user.User
 		CreatedAt time.Time
 		UpdatedAt time.Time
 	}
@@ -46,9 +46,14 @@ func (s *School) ToDomain() (*school.Domain, error) {
 		}
 	}
 
-	owner, err := s.Owner.Args()
-	if err != nil {
-		return nil, err
+	users := make([]domainUser.Args, len(s.Phones))
+	for i, u := range s.Users {
+		usr, err := u.Args()
+		if err != nil {
+			return nil, err
+		}
+
+		users[i] = *usr
 	}
 
 	return school.Existing(school.Args{
@@ -66,8 +71,8 @@ func (s *School) ToDomain() (*school.Domain, error) {
 		City:     s.City,
 		Street:   s.Street,
 		Domain:   s.Domain,
-		Owner:    *owner,
 		Phones:   phones,
+		Users:    users,
 	})
 }
 
@@ -83,7 +88,6 @@ func Model(args *school.Domain) School {
 		ID:        args.ID(),
 		Name:      args.Name(),
 		Domain:    args.Domain(),
-		OwnerId:   args.Owner().ID(),
 		Email:     args.Email(),
 		Region:    args.Region(),
 		District:  args.District(),

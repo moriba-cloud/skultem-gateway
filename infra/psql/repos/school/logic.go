@@ -20,16 +20,18 @@ func (m model) Save(args school.Domain) (*ddd.Response[school.Domain], error) {
 	model := Model(&args)
 
 	err := m.db.Transaction(func(tx *gorm.DB) error {
-		// create user
-		owner := args.Owner()
-		userModel := user.Model(owner)
-		if err := tx.Save(&userModel).Error; err != nil {
-			return err
-		}
 
 		// create school
 		if err := tx.Save(&model).Error; err != nil {
 			return err
+		}
+
+		// create user
+		for _, u := range args.Users() {
+			userModel := user.Model(&u)
+			if err := tx.Save(&userModel).Error; err != nil {
+				return err
+			}
 		}
 
 		// create contact
@@ -54,7 +56,7 @@ func (m model) Save(args school.Domain) (*ddd.Response[school.Domain], error) {
 func (m model) FindById(id string) (*ddd.Response[school.Domain], error) {
 	var model School
 	if err := m.db.Preload("Phones").
-		Preload("Owner").
+		Preload("Users.Role").
 		Where(&School{ID: id}).
 		First(&model).Error; err != nil {
 		return nil, err
@@ -110,7 +112,6 @@ func (m model) ListByPage(args ddd.PaginationArgs) (*ddd.Response[school.Domain]
 	})
 
 	m.db.Preload("Phones").
-		Preload("Owner").
 		Scopes(p.Paginate(m.db)).
 		Find(&models)
 

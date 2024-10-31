@@ -5,6 +5,7 @@ import (
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/middlewares"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
 	"github.com/moriba-cloud/skultem-gateway/domain/user"
 	"go.uber.org/zap"
@@ -18,18 +19,16 @@ type (
 		logger     *zap.Logger
 	}
 	User struct {
-		Id           string    `json:"id"`
-		GivenNames   string    `json:"givenNames"`
-		FamilyName   string    `json:"familyName"`
-		Email        string    `json:"email"`
-		Phone        int       `json:"phone"`
-		Role         Reference `json:"role"`
-		PasswordTxt  string    `json:"password"`
-		AccessToken  string    `json:"accessToken"`
-		RefreshToken string    `json:"refreshToken"`
-		State        ddd.State `json:"state"`
-		CreatedAt    string    `json:"createdAt"`
-		UpdatedAt    string    `json:"updatedAt"`
+		Id          string    `json:"id"`
+		GivenNames  string    `json:"givenNames"`
+		FamilyName  string    `json:"familyName"`
+		Email       string    `json:"email"`
+		Phone       int       `json:"phone"`
+		Role        Reference `json:"role"`
+		PasswordTxt string    `json:"password"`
+		State       ddd.State `json:"state"`
+		CreatedAt   string    `json:"createdAt"`
+		UpdatedAt   string    `json:"updatedAt"`
 	}
 	UserRequest struct {
 		GivenNames string `json:"givenNames" validate:"required"`
@@ -60,6 +59,7 @@ func UserResponse(o *user.Domain) *User {
 
 func (a apiUser) listByPage(c *fiber.Ctx) error {
 	payload := new(dto.Pagination)
+
 	if err := c.QueryParser(payload); err != nil {
 		return err
 	}
@@ -175,6 +175,25 @@ func (a apiUser) update(c *fiber.Ctx) error {
 	}))
 }
 
+func (a apiUser) findById(c *fiber.Ctx) error {
+	payload := new(dto.ById)
+	if err := c.ParamsParser(payload); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	if err := a.validation.Run(payload); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	res, err := a.app.FindById(c.Context(), payload.Id)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(dto.NewResponse(dto.ResponseArgs[User]{
+		Record: UserResponse(res.Record()),
+	}))
+}
+
 func (a apiUser) remove(c *fiber.Ctx) error {
 	payload := new(dto.ById)
 	if err := c.ParamsParser(payload); err != nil {
@@ -201,9 +220,10 @@ func UserRoute(api fiber.Router, app user.App, logger *zap.Logger) {
 		logger:     logger,
 	}
 
-	api.Group("/user").
+	api.Group("/user", middlewares.AccessTokenGuard).
 		Get("", r.listByPage).
 		Get("/option", r.list).
+		Get("/:id", r.findById).
 		Post("", r.new).
 		Patch("/:id", r.update).
 		Delete("/:id", r.remove)

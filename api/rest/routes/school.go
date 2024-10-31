@@ -36,7 +36,7 @@ type (
 		City      string    `json:"city"`
 		Street    string    `json:"street"`
 		Phones    []int     `json:"phones"`
-		Owner     Owner     `json:"owner"`
+		Users     []*User   `json:"users"`
 		State     ddd.State `json:"state"`
 		CreatedAt string    `json:"createdAt"`
 		UpdatedAt string    `json:"updatedAt"`
@@ -63,27 +63,28 @@ type (
 
 func SchoolResponse(o *school.Domain) *School {
 	phones := make([]int, len(o.Phones()))
+	users := make([]*User, len(o.Users()))
+
 	for i, phone := range o.Phones() {
 		phones[i] = phone.Number()
 	}
 
+	for i, u := range o.Users() {
+		users[i] = UserResponse(&u)
+	}
+
 	return &School{
-		Id:       o.ID(),
-		Name:     o.Name(),
-		Domain:   o.Domain(),
-		Region:   o.Region(),
-		District: o.District(),
-		Chiefdom: o.Chiefdom(),
-		City:     o.City(),
-		Phones:   phones,
-		Email:    o.Email(),
-		Owner: Owner{
-			Id:         o.ID(),
-			GivenNames: o.Owner().GivenNames(),
-			FamilyName: o.Owner().FamilyName(),
-			Email:      o.Owner().Email(),
-			Phone:      o.Owner().Phone(),
-		},
+		Id:        o.ID(),
+		Name:      o.Name(),
+		Domain:    o.Domain(),
+		Region:    o.Region(),
+		District:  o.District(),
+		Chiefdom:  o.Chiefdom(),
+		City:      o.City(),
+		Street:    o.Street(),
+		Phones:    phones,
+		Users:     users,
+		Email:     o.Email(),
 		State:     o.State(),
 		CreatedAt: o.CreatedAt().Format(time.RFC850),
 		UpdatedAt: o.UpdatedAt().Format(time.RFC850),
@@ -123,6 +124,25 @@ func (a apiSchool) listByPage(c *fiber.Ctx) error {
 	}))
 }
 
+func (a apiSchool) findById(c *fiber.Ctx) error {
+	payload := new(dto.ById)
+	if err := c.ParamsParser(payload); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	if err := a.validation.Run(payload); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	res, err := a.app.FindById(c.Context(), payload.Id)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(dto.NewResponse(dto.ResponseArgs[School]{
+		Record: SchoolResponse(res.Record()),
+	}))
+}
+
 func (a apiSchool) list(c *fiber.Ctx) error {
 	res, err := a.app.List(c.Context())
 	if err != nil {
@@ -152,12 +172,14 @@ func (a apiSchool) new(c *fiber.Ctx) error {
 	}
 
 	phones := make([]domain.PhoneArgs, len(payload.Phones))
+	users := make([]user.Args, 1)
+
 	for i, phone := range payload.Phones {
 		phones[i] = domain.PhoneArgs{
 			Number: phone,
 		}
 	}
-	owner := user.Args{
+	users[0] = user.Args{
 		GivenNames: payload.Owner.GivenNames,
 		FamilyName: payload.Owner.FamilyName,
 		Phone:      payload.Owner.Phone,
@@ -174,7 +196,7 @@ func (a apiSchool) new(c *fiber.Ctx) error {
 		City:     payload.City,
 		Street:   payload.Street,
 		Phones:   phones,
-		Owner:    owner,
+		Users:    users,
 	})
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotAcceptable, err.Error())
@@ -271,6 +293,7 @@ func SchoolRoute(api fiber.Router, app school.App, logger *zap.Logger) {
 	api.Group("/school").
 		Get("", r.listByPage).
 		Get("/option", r.list).
+		Get("/:id", r.findById).
 		Post("", r.new).
 		Patch("/:id", r.update).
 		Delete("/:id", r.remove)

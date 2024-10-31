@@ -21,8 +21,7 @@ type (
 		email      string
 		role       core.Reference
 		password   core.Password
-		access     string
-		refresh    string
+		school     string
 	}
 	AuthArgs struct {
 		Email    string
@@ -34,10 +33,9 @@ type (
 		FamilyName  string
 		Phone       int
 		Email       string
+		School      string
 		Role        core.Reference
 		Password    core.Password
-		Access      string
-		Refresh     string
 	}
 	App interface {
 		New(ctx context.Context, args Args) (*ddd.Response[Domain], error)
@@ -54,7 +52,7 @@ type (
 		CheckByEmail(email string) (*Domain, error)
 		CheckByPhone(phone int) (*Domain, error)
 		List() (*ddd.Response[core.Option], error)
-		ListByPage(args ddd.PaginationArgs) (*ddd.Response[Domain], error)
+		ListByPage(args ddd.PaginationArgs, school string) (*ddd.Response[Domain], error)
 		Remove(args Domain) (*Domain, error)
 	}
 )
@@ -75,20 +73,16 @@ func (d *Domain) Email() string {
 	return d.email
 }
 
+func (d *Domain) School() string {
+	return d.school
+}
+
 func (d *Domain) Role() core.Reference {
 	return d.role
 }
 
 func (d *Domain) Password() core.Password {
 	return d.password
-}
-
-func (d *Domain) Access() string {
-	return d.access
-}
-
-func (d *Domain) Refresh() string {
-	return d.refresh
 }
 
 func (d *Domain) Update(args Args) error {

@@ -16,11 +16,11 @@ type (
 		ReadAll   bool
 		Edit      bool
 		Delete    bool
-		Role      role.Role
-		RoleId    string `gorm:"index"`
-		Feature   feature.Feature
-		FeatureId string `gorm:"index"`
 		State     string
+		RoleId    string `gorm:"index"`
+		FeatureId string `gorm:"index"`
+		Role      role.Role
+		Feature   feature.Feature
 		CreatedAt time.Time
 		UpdatedAt time.Time
 	}

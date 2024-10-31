@@ -24,7 +24,7 @@ type (
 		city     string
 		street   string
 		phones   []domain.Phone
-		owner    *user.Domain
+		users    []user.Domain
 	}
 	Args struct {
 		Aggregation ddd.AggregationArgs
@@ -37,7 +37,7 @@ type (
 		City        string
 		Street      string
 		Phones      []domain.PhoneArgs
-		Owner       user.Args
+		Users       []user.Args
 	}
 	App interface {
 		New(ctx context.Context, args Args) (*ddd.Response[Domain], error)
@@ -89,8 +89,8 @@ func (d *Domain) Email() string {
 	return d.email
 }
 
-func (d *Domain) Owner() *user.Domain {
-	return d.owner
+func (d *Domain) Users() []user.Domain {
+	return d.users
 }
 
 func (d *Domain) Option() *core.Option {

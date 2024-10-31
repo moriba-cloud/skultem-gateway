@@ -5,6 +5,7 @@ import (
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/middlewares"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
 	"github.com/moriba-cloud/skultem-gateway/domain/permission"
 	"go.uber.org/zap"
@@ -112,6 +113,6 @@ func PermissionRoute(api fiber.Router, app permission.App, logger *zap.Logger) {
 		logger:     logger,
 	}
 
-	router := api.Group("/permission")
+	router := api.Group("/permission", middlewares.AccessTokenGuard)
 	router.Post("/:id", r.new)
 }

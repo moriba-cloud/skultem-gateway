@@ -12,12 +12,14 @@ type (
 		*ddd.Aggregation
 		name        string
 		description string
+		school      string
 		permissions []*permission.Domain
 	}
 	Args struct {
 		Aggregation ddd.AggregationArgs
 		Name        string
 		Description string
+		School      string
 		Permissions []*permission.Domain
 	}
 	App interface {
@@ -32,7 +34,7 @@ type (
 		Save(args Domain) (*Domain, error)
 		Check(name string) (*Domain, error)
 		FindById(id string) (*Domain, error)
-		ListByPage(args ddd.PaginationArgs) (*ddd.Response[Domain], error)
+		ListByPage(args ddd.PaginationArgs, school string) (*ddd.Response[Domain], error)
 		List() (*ddd.Response[core.Option], error)
 		Remove(args Domain) (*Domain, error)
 	}
@@ -44,6 +46,10 @@ func (d *Domain) Name() string {
 
 func (d *Domain) Description() string {
 	return d.description
+}
+
+func (d *Domain) School() string {
+	return d.school
 }
 
 func (d *Domain) Permissions() []*permission.Domain {

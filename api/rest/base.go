@@ -31,6 +31,11 @@ func Api(args Args) {
 	})
 
 	api.Api().Use(cors.New())
+	api.Api().Use(func(c *fiber.Ctx) error {
+		c.Locals("uApp", args.Apps.User)
+		return c.Next()
+	})
+
 	routes.Routes(routes.Args{
 		Route:  api.Api(),
 		Apps:   args.Apps,

@@ -13,6 +13,7 @@ type (
 		Name        string
 		Description string
 		State       string
+		SchoolId    string `gorm:"index"`
 		CreatedAt   time.Time
 		UpdatedAt   time.Time
 	}
@@ -28,6 +29,7 @@ func (r Role) Domain() (*role.Domain, error) {
 		},
 		Name:        r.Name,
 		Description: r.Description,
+		School:      r.SchoolId,
 	})
 }
 
@@ -43,6 +45,7 @@ func Model(args *role.Domain) Role {
 		ID:          args.ID(),
 		Name:        args.Name(),
 		Description: args.Description(),
+		SchoolId:    args.School(),
 		State:       string(args.State()),
 		CreatedAt:   *args.CreatedAt(),
 		UpdatedAt:   *args.UpdatedAt(),

@@ -28,9 +28,15 @@ func New(args Args) (*Domain, error) {
 		phones[i] = *phone
 	}
 
-	owner, err := user.New(args.Owner)
-	if err != nil {
-		return nil, err
+	users := make([]user.Domain, len(args.Users))
+	for i, u := range args.Users {
+		u.School = Aggregation.ID()
+		usr, err := user.New(u)
+		if err != nil {
+			return nil, err
+		}
+
+		users[i] = *usr
 	}
 
 	return &Domain{
@@ -44,11 +50,16 @@ func New(args Args) (*Domain, error) {
 		city:        stn.Clean(args.City),
 		street:      stn.Clean(args.Street),
 		phones:      phones,
-		owner:       owner,
+		users:       users,
 	}, nil
 }
 
 func Existing(args Args) (*Domain, error) {
+
+	Aggregation, err := ddd.ExistingAggregation(args.Aggregation)
+	if err != nil {
+		return nil, err
+	}
 	if err := validation(args); err != nil {
 		return nil, err
 	}
@@ -66,14 +77,14 @@ func Existing(args Args) (*Domain, error) {
 		phones[i] = *phone
 	}
 
-	owner, err := user.New(args.Owner)
-	if err != nil {
-		return nil, err
-	}
+	users := make([]user.Domain, len(args.Users))
+	for i, u := range args.Users {
+		usr, err := user.Existing(u)
+		if err != nil {
+			return nil, err
+		}
 
-	Aggregation, err := ddd.ExistingAggregation(args.Aggregation)
-	if err != nil {
-		return nil, err
+		users[i] = *usr
 	}
 
 	return &Domain{
@@ -87,7 +98,7 @@ func Existing(args Args) (*Domain, error) {
 		city:        stn.Clean(args.City),
 		street:      stn.Clean(args.Street),
 		phones:      phones,
-		owner:       owner,
+		users:       users,
 	}, nil
 }
 
@@ -128,6 +139,10 @@ func validation(args Args) error {
 
 	if len(args.Phones) < 0 {
 		errors = append(errors, "minimum of 1 phone is required")
+	}
+
+	if len(args.Users) < 0 {
+		errors = append(errors, "minimum of 1 user is required")
 	}
 
 	if len(errors) > 0 {

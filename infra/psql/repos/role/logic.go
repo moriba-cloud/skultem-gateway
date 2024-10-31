@@ -40,7 +40,7 @@ func (m *model) FindById(id string) (*role.Domain, error) {
 	return model.Domain()
 }
 
-func (m *model) ListByPage(args ddd.PaginationArgs) (*ddd.Response[role.Domain], error) {
+func (m *model) ListByPage(args ddd.PaginationArgs, school string) (*ddd.Response[role.Domain], error) {
 	records := make([]*role.Domain, 0)
 	models := make([]*Role, 0)
 	p := psql.NewPagination[Role](psql.PaginationArgs{
@@ -48,7 +48,7 @@ func (m *model) ListByPage(args ddd.PaginationArgs) (*ddd.Response[role.Domain],
 		Page:  args.Page,
 	})
 
-	m.db.Scopes(p.Paginate(m.db)).Find(&models)
+	m.db.Where("school_id = ?", school).Scopes(p.Paginate(m.db)).Find(&models)
 	for _, record := range models {
 		d, err := record.Domain()
 		if err != nil {

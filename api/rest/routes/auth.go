@@ -4,13 +4,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
-	"github.com/moriba-cloud/skultem-gateway/api/rest/routes/middlewares"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/middlewares"
 	"github.com/moriba-cloud/skultem-gateway/domain/auth"
 	"go.uber.org/zap"
 )
 
 type (
-	apiAuth struct {
+	ApiAuth struct {
 		validation *validation.Validation
 		app        auth.App
 		logger     *zap.Logger
@@ -32,7 +32,7 @@ func AuthResponse(o *auth.Domain) *Auth {
 	}
 }
 
-func (a apiAuth) login(c *fiber.Ctx) error {
+func (a ApiAuth) login(c *fiber.Ctx) error {
 	payload := new(AuthRequest)
 	if err := c.BodyParser(payload); err != nil {
 		return err
@@ -54,7 +54,7 @@ func (a apiAuth) login(c *fiber.Ctx) error {
 	}))
 }
 
-func (a apiAuth) access(c *fiber.Ctx) error {
+func (a ApiAuth) access(c *fiber.Ctx) error {
 	refresh := c.Get("refresh")
 	res, err := a.app.Access(c.Context(), refresh)
 
@@ -70,7 +70,7 @@ func (a apiAuth) access(c *fiber.Ctx) error {
 }
 
 func AuthRoute(api fiber.Router, app auth.App, logger *zap.Logger) {
-	r := &apiAuth{
+	r := &ApiAuth{
 		app:        app,
 		validation: validation.NewValidation(),
 		logger:     logger,

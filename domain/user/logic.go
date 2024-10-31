@@ -24,6 +24,7 @@ func New(args Args) (*Domain, error) {
 		phone:       args.Phone,
 		email:       stn.Clean(args.Email),
 		role:        args.Role,
+		school:      args.School,
 		password:    *password,
 	}, nil
 }
@@ -45,6 +46,7 @@ func Existing(args Args) (*Domain, error) {
 		phone:       args.Phone,
 		email:       stn.Clean(args.Email),
 		role:        args.Role,
+		school:      args.School,
 		password:    args.Password,
 	}, nil
 }
