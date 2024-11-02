@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/moriba-build/ose/ddd"
+	"github.com/moriba-cloud/skultem-gateway/domain/auth"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
 	"github.com/moriba-cloud/skultem-gateway/domain/user"
 	"go.uber.org/zap"
@@ -21,8 +22,8 @@ type (
 )
 
 func (a aUser) New(ctx context.Context, args user.Args) (*ddd.Response[user.Domain], error) {
-	school := core.GetContextValue(ctx, "school")
-	args.School = school
+	payload := auth.ActiveUser(ctx, "user")
+	args.School = payload.School
 
 	o, err := user.New(args)
 	if err != nil {
@@ -92,8 +93,8 @@ func (a aUser) Update(ctx context.Context, args user.Args) (*ddd.Response[user.D
 }
 
 func (a aUser) ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[user.Domain], error) {
-	school := core.GetContextValue(ctx, "school")
-	return a.repo.ListByPage(args, school)
+	payload := auth.ActiveUser(ctx, "user")
+	return a.repo.ListByPage(args, payload.School)
 }
 
 func (a aUser) List(ctx context.Context) (*ddd.Response[core.Option], error) {

@@ -19,6 +19,16 @@ type (
 		Access  string `json:"access"`
 		Refresh string `json:"refresh"`
 	}
+	AuthUser struct {
+		Id         string
+		GivenNames string
+		FamilyName string
+		Phone      int
+		Email      string
+		Role       Reference
+		School     string
+		State      string
+	}
 	AuthRequest struct {
 		Email    string `json:"email" validate:"required,email"`
 		Password string `json:"password" validate:"required"`
@@ -29,6 +39,22 @@ func AuthResponse(o *auth.Domain) *Auth {
 	return &Auth{
 		Access:  o.Access(),
 		Refresh: o.Refresh(),
+	}
+}
+
+func AuthUserResponse(o *auth.User) *AuthUser {
+	return &AuthUser{
+		Id:         o.Id,
+		GivenNames: o.GivenNames,
+		FamilyName: o.FamilyName,
+		Phone:      o.Phone,
+		Email:      o.Email,
+		Role: Reference{
+			Id:    o.Role.Id,
+			Value: o.Role.Value,
+		},
+		School: o.School,
+		State:  o.State,
 	}
 }
 
@@ -69,6 +95,17 @@ func (a ApiAuth) access(c *fiber.Ctx) error {
 	}))
 }
 
+func (a ApiAuth) me(c *fiber.Ctx) error {
+	res, err := a.app.Me(c.Context())
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, err.Error())
+	}
+	record := AuthUserResponse(res.Record())
+	return c.JSON(dto.NewResponse(dto.ResponseArgs[AuthUser]{
+		Record: record,
+	}))
+}
+
 func AuthRoute(api fiber.Router, app auth.App, logger *zap.Logger) {
 	r := &ApiAuth{
 		app:        app,
@@ -78,5 +115,6 @@ func AuthRoute(api fiber.Router, app auth.App, logger *zap.Logger) {
 
 	api.Group("/auth").
 		Post("login", r.login).
-		Get("refresh", middlewares.RefreshTokenGuard, r.access)
+		Get("refresh", middlewares.RefreshTokenGuard, r.access).
+		Get("me", middlewares.AccessTokenGuard, r.me)
 }

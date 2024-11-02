@@ -1,7 +1,6 @@
 package core
 
 import (
-	"context"
 	"fmt"
 	"github.com/sethvargo/go-password/password"
 	"golang.org/x/crypto/bcrypt"
@@ -66,13 +65,4 @@ func GeneratePassword() (*Password, error) {
 func CheckPassword(hash string, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
-}
-
-func GetContextValue(ctx context.Context, key string) string {
-	val := ctx.Value(key)
-	if val != nil {
-		return val.(string)
-	}
-
-	return ""
 }

@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"fmt"
 	"github.com/golang-jwt/jwt"
 	"github.com/moriba-build/ose/ddd/config"
@@ -49,6 +50,15 @@ func AccessToken(id string) (string, error) {
 	claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
 
 	return token.SignedString(secret)
+}
+
+func ActiveUser(ctx context.Context, key string) *User {
+	val := ctx.Value(key)
+	if val != nil {
+		return val.(*User)
+	}
+
+	return nil
 }
 
 func RefreshToken(id string) (string, error) {

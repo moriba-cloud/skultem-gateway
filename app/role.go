@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/moriba-build/ose/ddd"
+	"github.com/moriba-cloud/skultem-gateway/domain/auth"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
 	"github.com/moriba-cloud/skultem-gateway/domain/permission"
 	"github.com/moriba-cloud/skultem-gateway/domain/role"
@@ -44,8 +45,8 @@ func (a aRole) FindById(ctx context.Context, id string) (*ddd.Response[role.Doma
 }
 
 func (a aRole) New(ctx context.Context, args role.Args) (*ddd.Response[role.Domain], error) {
-	school := core.GetContextValue(ctx, "school")
-	args.School = school
+	payload := auth.ActiveUser(ctx, "user")
+	args.School = payload.School
 
 	o, err := role.New(args)
 	if err != nil {
@@ -87,8 +88,8 @@ func (a aRole) Update(ctx context.Context, args role.Args) (*ddd.Response[role.D
 }
 
 func (a aRole) ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[role.Domain], error) {
-	school := core.GetContextValue(ctx, "school")
-	return a.repo.ListByPage(args, school)
+	payload := auth.ActiveUser(ctx, "user")
+	return a.repo.ListByPage(args, payload.School)
 }
 
 func (a aRole) List(ctx context.Context) (*ddd.Response[core.Option], error) {

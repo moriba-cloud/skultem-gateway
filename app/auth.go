@@ -50,6 +50,13 @@ func (a aAuth) Access(ctx context.Context, refresh string) (*ddd.Response[auth.D
 	}), nil
 }
 
+func (a aAuth) Me(ctx context.Context) (*ddd.Response[auth.User], error) {
+	payload := auth.ActiveUser(ctx, "user")
+	return ddd.NewResponse(ddd.ResponseArgs[auth.User]{
+		Record: payload,
+	}), nil
+}
+
 func NewAuth(args argsAuth) auth.App {
 	return &aAuth{
 		repo:   args.Repo,
