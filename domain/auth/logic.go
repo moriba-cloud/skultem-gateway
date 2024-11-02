@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
 	"github.com/moriba-build/ose/ddd/config"
+	"github.com/moriba-cloud/skultem-gateway/domain/core"
 	"time"
 )
 
@@ -58,7 +59,19 @@ func ActiveUser(ctx context.Context, key string) *User {
 		return val.(*User)
 	}
 
-	return nil
+	return &User{
+		Id:         "",
+		GivenNames: "",
+		FamilyName: "",
+		Phone:      0,
+		Email:      "",
+		Role: core.Reference{
+			Id:    "",
+			Value: "",
+		},
+		School: "",
+		State:  "",
+	}
 }
 
 func RefreshToken(id string) (string, error) {
