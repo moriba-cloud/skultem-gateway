@@ -24,9 +24,9 @@ func (m *model) Save(args role.Domain) (*role.Domain, error) {
 	return model.Domain()
 }
 
-func (m *model) Check(name string) (*role.Domain, error) {
+func (m *model) Check(name string, school string) (*role.Domain, error) {
 	var model Role
-	if err := m.db.Where(&Role{Name: name}).First(&model).Error; err != nil {
+	if err := m.db.Where(&Role{Name: name, SchoolId: school}).First(&model).Error; err != nil {
 		return nil, err
 	}
 	return model.Domain()

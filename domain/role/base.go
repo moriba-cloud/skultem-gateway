@@ -32,7 +32,7 @@ type (
 	}
 	Repo interface {
 		Save(args Domain) (*Domain, error)
-		Check(name string) (*Domain, error)
+		Check(name string, school string) (*Domain, error)
 		FindById(id string) (*Domain, error)
 		ListByPage(args ddd.PaginationArgs, school string) (*ddd.Response[Domain], error)
 		List() (*ddd.Response[core.Option], error)

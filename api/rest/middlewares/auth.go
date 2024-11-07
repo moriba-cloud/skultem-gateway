@@ -34,12 +34,13 @@ func RefreshTokenGuard(c *fiber.Ctx) error {
 	if c.GetReqHeaders()["Authorization"] != nil {
 		authorization := c.GetReqHeaders()["Authorization"][0]
 		userToken := strings.Replace(authorization, "Bearer ", "", 1)
+
 		_, err := auth.VerifyRefreshToken(userToken)
 		if err != nil {
 			return fiber.NewError(fiber.StatusUnauthorized, err.Error())
 		}
 
-		c.Set("refresh", userToken)
+		c.Locals("refresh", userToken)
 		return c.Next()
 	}
 

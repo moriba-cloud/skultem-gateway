@@ -27,7 +27,7 @@ type (
 	}
 	App interface {
 		Login(ctx context.Context, email string, password string) (*ddd.Response[Domain], error)
-		Access(ctx context.Context, refresh string) (*ddd.Response[Domain], error)
+		Access(ctx context.Context) (*ddd.Response[Domain], error)
 		Me(ctx context.Context) (*ddd.Response[User], error)
 	}
 )

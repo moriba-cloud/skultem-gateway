@@ -30,23 +30,22 @@ type (
 )
 
 func (s *School) ToDomain() (*school.Domain, error) {
-
 	phones := make([]ose.PhoneArgs, len(s.Phones))
-	for i, o := range s.Phones {
+	for i, p := range s.Phones {
 		phones[i] = ose.PhoneArgs{
 			Aggregation: ddd.AggregationArgs{
-				Id:        o.ID,
-				State:     ddd.State(o.State),
-				CreatedAt: &o.CreatedAt,
-				UpdatedAt: &o.UpdatedAt,
+				Id:        p.ID,
+				State:     ddd.State(p.State),
+				CreatedAt: &p.CreatedAt,
+				UpdatedAt: &p.UpdatedAt,
 			},
-			Primary: o.Primary,
-			Number:  o.Number,
-			Country: o.Country,
+			Primary: p.Primary,
+			Number:  p.Number,
+			Country: p.Country,
 		}
 	}
 
-	users := make([]domainUser.Args, len(s.Phones))
+	users := make([]domainUser.Args, len(s.Users))
 	for i, u := range s.Users {
 		usr, err := u.Args()
 		if err != nil {

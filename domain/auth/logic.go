@@ -74,9 +74,19 @@ func ActiveUser(ctx context.Context, key string) *User {
 	}
 }
 
+func ActiveRefreshToken(ctx context.Context) string {
+	val := ctx.Value("refresh")
+	if val != nil {
+		return val.(string)
+	}
+
+	return ""
+}
+
 func RefreshToken(id string) (string, error) {
 	value := config.NewEnvs().EnvStr("REFRESH_SECRET_KEY")
 	var secret = []byte(value)
+
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 

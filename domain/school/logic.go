@@ -55,7 +55,6 @@ func New(args Args) (*Domain, error) {
 }
 
 func Existing(args Args) (*Domain, error) {
-
 	Aggregation, err := ddd.ExistingAggregation(args.Aggregation)
 	if err != nil {
 		return nil, err
@@ -66,14 +65,10 @@ func Existing(args Args) (*Domain, error) {
 	phones := make([]domain.Phone, len(args.Phones))
 
 	for i, p := range args.Phones {
-		phone, err := domain.NewPhone(domain.PhoneArgs{
-			Primary: false,
-			Number:  p.Number,
-		})
+		phone, err := domain.ExistingPhone(p)
 		if err != nil {
 			return nil, err
 		}
-
 		phones[i] = *phone
 	}
 
@@ -83,7 +78,6 @@ func Existing(args Args) (*Domain, error) {
 		if err != nil {
 			return nil, err
 		}
-
 		users[i] = *usr
 	}
 

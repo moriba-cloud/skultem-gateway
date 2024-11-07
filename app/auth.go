@@ -29,7 +29,7 @@ func (a aAuth) Login(ctx context.Context, email string, password string) (*ddd.R
 	record := res.Record()
 
 	if match := core.CheckPassword(record.Password().Hash, password); !match {
-		return nil, fmt.Errorf("try again this password id incorrect")
+		return nil, fmt.Errorf("try again this password is incorrect")
 	}
 
 	token, err := auth.New(record.ID())
@@ -39,8 +39,9 @@ func (a aAuth) Login(ctx context.Context, email string, password string) (*ddd.R
 	}), nil
 }
 
-func (a aAuth) Access(ctx context.Context, refresh string) (*ddd.Response[auth.Domain], error) {
-	record, err := auth.New(refresh)
+func (a aAuth) Access(ctx context.Context) (*ddd.Response[auth.Domain], error) {
+	refresh := auth.ActiveRefreshToken(ctx)
+	record, err := auth.Existing(refresh)
 	if err != nil {
 		return nil, err
 	}

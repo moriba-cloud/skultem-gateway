@@ -81,8 +81,7 @@ func (a ApiAuth) login(c *fiber.Ctx) error {
 }
 
 func (a ApiAuth) access(c *fiber.Ctx) error {
-	refresh := c.Get("refresh")
-	res, err := a.app.Access(c.Context(), refresh)
+	res, err := a.app.Access(c.Context())
 
 	if err != nil {
 		return fiber.NewError(fiber.StatusUnauthorized, err.Error())

@@ -53,7 +53,7 @@ func (a aRole) New(ctx context.Context, args role.Args) (*ddd.Response[role.Doma
 		return nil, err
 	}
 
-	if _, err := a.repo.Check(o.Name()); err == nil {
+	if _, err := a.repo.Check(o.Name(), args.School); err == nil {
 		return nil, fmt.Errorf("role: %s already exists", o.Name())
 	}
 
@@ -68,12 +68,14 @@ func (a aRole) New(ctx context.Context, args role.Args) (*ddd.Response[role.Doma
 }
 
 func (a aRole) Update(ctx context.Context, args role.Args) (*ddd.Response[role.Domain], error) {
+	payload := auth.ActiveUser(ctx, "user")
+	args.School = payload.School
 	record, err := a.repo.FindById(args.Aggregation.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	if check, _ := a.repo.Check(args.Name); check != nil {
+	if check, _ := a.repo.Check(args.Name, args.School); check != nil {
 		if check.ID() != record.ID() {
 			return nil, fmt.Errorf("role: %s already exists", args.Name)
 		}
