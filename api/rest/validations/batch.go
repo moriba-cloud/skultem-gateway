@@ -6,7 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/moriba-build/ose/ddd/utils/stn"
-	"github.com/moriba-cloud/skultem-management/domain/values"
+	"github.com/moriba-cloud/skultem-gateway/domain/values"
 	"slices"
 )
 

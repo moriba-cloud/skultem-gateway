@@ -11,8 +11,8 @@ import (
 func AccessTokenGuard(c *fiber.Ctx) error {
 	if c.GetReqHeaders()["Authorization"] != nil {
 		authorization := c.GetReqHeaders()["Authorization"][0]
-		userToken := strings.Replace(authorization, "Bearer ", "", 1)
-		token, err := auth.VerifyAccessToken(userToken)
+		access := strings.Replace(authorization, "Bearer ", "", 1)
+		token, err := auth.VerifyAccessToken(access)
 		if err != nil {
 			return fiber.NewError(fiber.StatusUnauthorized, err.Error())
 		}
@@ -24,6 +24,8 @@ func AccessTokenGuard(c *fiber.Ctx) error {
 		}
 
 		c.Locals("user", record)
+		c.Locals("access", access)
+
 		return c.Next()
 	}
 

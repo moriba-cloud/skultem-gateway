@@ -3,7 +3,7 @@ package values
 import (
 	"context"
 	"github.com/moriba-build/ose/ddd"
-	"github.com/moriba-cloud/skultem-management/domain/core"
+	"github.com/moriba-cloud/skultem-gateway/domain/core"
 )
 
 type (
@@ -28,18 +28,15 @@ type (
 	}
 	App interface {
 		New(ctx context.Context, args Args) (*ddd.Response[Domain], error)
-		One(ctx context.Context, id string) (*ddd.Response[Domain], error)
 		List(ctx context.Context) (*ddd.Response[core.Option], error)
-		ListByGroup(ctx context.Context, group Batch) (*ddd.Response[core.Option], error)
+		ListByGroup(ctx context.Context, batch Batch) (*ddd.Response[core.Option], error)
 		ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[Domain], error)
 	}
-	Repo interface {
-		Save(args *Domain) (*Domain, error)
-		OneById(id string) (*Domain, error)
-		Check(key string, batch Batch) bool
-		List(school string) (*ddd.Response[core.Option], error)
-		ListByGroup(batch Batch, school string) (*ddd.Response[core.Option], error)
-		ListByPage(args ddd.PaginationArgs, school string) (*ddd.Response[Domain], error)
+	Service interface {
+		Save(ctx context.Context, args Domain) (*ddd.Response[Domain], error)
+		ListByBatch(ctx context.Context, group Batch) (*ddd.Response[core.Option], error)
+		ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[Domain], error)
+		List(ctx context.Context) (*ddd.Response[core.Option], error)
 	}
 )
 

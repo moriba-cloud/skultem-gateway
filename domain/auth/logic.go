@@ -9,12 +9,12 @@ import (
 	"time"
 )
 
-func New(id string) (*Domain, error) {
-	access, err := AccessToken(id)
+func New(id string, school string) (*Domain, error) {
+	access, err := AccessToken(id, school)
 	if err != nil {
 		return nil, err
 	}
-	refresh, err := RefreshToken(id)
+	refresh, err := RefreshToken(id, school)
 	if err != nil {
 		return nil, err
 	}
@@ -32,15 +32,16 @@ func Existing(refresh string) (*Domain, error) {
 	}
 
 	id := token["id"].(string)
+	school := token["school"].(string)
 
-	access, err := AccessToken(id)
+	access, err := AccessToken(id, school)
 	return &Domain{
 		access:  access,
 		refresh: refresh,
 	}, nil
 }
 
-func AccessToken(id string) (string, error) {
+func AccessToken(id string, school string) (string, error) {
 	value := config.NewEnvs().EnvStr("ACCESS_SECRET_KEY")
 	var secret = []byte(value)
 
@@ -48,6 +49,7 @@ func AccessToken(id string) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["id"] = id
+	claims["school"] = school
 	claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
 
 	return token.SignedString(secret)
@@ -74,6 +76,15 @@ func ActiveUser(ctx context.Context, key string) *User {
 	}
 }
 
+func ActiveAccessToken(ctx context.Context) string {
+	val := ctx.Value("access")
+	if val != nil {
+		return val.(string)
+	}
+
+	return ""
+}
+
 func ActiveRefreshToken(ctx context.Context) string {
 	val := ctx.Value("refresh")
 	if val != nil {
@@ -83,7 +94,7 @@ func ActiveRefreshToken(ctx context.Context) string {
 	return ""
 }
 
-func RefreshToken(id string) (string, error) {
+func RefreshToken(id string, school string) (string, error) {
 	value := config.NewEnvs().EnvStr("REFRESH_SECRET_KEY")
 	var secret = []byte(value)
 
@@ -91,6 +102,7 @@ func RefreshToken(id string) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["id"] = id
+	claims["school"] = school
 	claims["exp"] = time.Now().Add(time.Hour * 8).Unix()
 
 	return token.SignedString(secret)

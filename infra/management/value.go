@@ -6,94 +6,69 @@ import (
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-build/ose/ddd/config"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
-	"github.com/moriba-cloud/skultem-gateway/domain/year"
-	academicv1 "github.com/moriba-cloud/skultem-gateway/infra/management/grpc/gen/go/academic/v1"
+	"github.com/moriba-cloud/skultem-gateway/domain/values"
 	commonv1 "github.com/moriba-cloud/skultem-gateway/infra/management/grpc/gen/go/common/v1"
+	valuev1 "github.com/moriba-cloud/skultem-gateway/infra/management/grpc/gen/go/value/v1"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
-	"strconv"
 )
 
 type (
-	yearService struct {
+	valueService struct {
 		conn   *grpc.ClientConn
 		logger *zap.Logger
 	}
 )
 
-func ToDomain(record *academicv1.Academic) (*year.Domain, error) {
+func ToValueDomain(record *valuev1.Value) (*values.Domain, error) {
 	createdAt := record.CreatedAt.AsTime()
 	updatedAt := record.UpdatedAt.AsTime()
 
-	start, err := strconv.Atoi(record.GetStart())
-	if err != nil {
-		return nil, err
-	}
-
-	end, err := strconv.Atoi(record.GetEnd())
-	if err != nil {
-		return nil, err
-	}
-
-	return year.Existing(year.Args{
+	return values.Existing(values.Args{
 		Aggregation: ddd.AggregationArgs{
 			Id:        record.Id,
 			State:     ddd.State(record.State),
 			CreatedAt: &createdAt,
 			UpdatedAt: &updatedAt,
 		},
-		Start: int64(start),
-		End:   int64(end),
+		Value: record.GetValue(),
+		Batch: values.Batch(record.GetBatch()),
+		Key:   record.GetKey(),
 	})
 }
 
-func (i *yearService) Save(ctx context.Context, args year.Domain) (*ddd.Response[year.Domain], error) {
-	conn := academicv1.NewAcademicServiceClient(i.conn)
-	res, err := conn.Create(ctx, &academicv1.CreateRequest{
-		Start: args.Start(),
-		End:   args.End(),
-	})
-	if err != nil {
-		return nil, CleanError(err.Error())
-	}
-
-	record, err := ToDomain(res.GetRecord())
-	if err != nil {
-		return nil, err
-	}
-
-	i.logger.Info(fmt.Sprintf("saved academic year with id: %s", record.ID()))
-	return ddd.NewResponse(ddd.ResponseArgs[year.Domain]{
-		Record: record,
-	}), nil
-}
-
-func (i *yearService) OneById(ctx context.Context, id string) (*ddd.Response[year.Domain], error) {
-	conn := academicv1.NewAcademicServiceClient(i.conn)
-	res, err := conn.Read(ctx, &academicv1.ReadRequest{
-		Id: id,
-	})
-	if err != nil {
-		return nil, CleanError(err.Error())
-	}
-
-	record, err := ToDomain(res.GetRecord())
-	if err != nil {
-		return nil, err
-	}
-
-	i.logger.Info(fmt.Sprintf("fetched academic year with id: %s", id))
-	return ddd.NewResponse(ddd.ResponseArgs[year.Domain]{
-		Record: record,
-	}), nil
-}
-
-func (i *yearService) ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[year.Domain], error) {
-	conn := academicv1.NewAcademicServiceClient(i.conn)
+func (i *valueService) Save(ctx context.Context, args values.Domain) (*ddd.Response[values.Domain], error) {
 	ctx = GrpcMetadata(ctx)
-	res, err := conn.ReadAll(ctx, &academicv1.ReadAllRequest{Query: &commonv1.Query{
+	conn := valuev1.NewValueServiceClient(i.conn)
+
+	res, err := conn.Create(ctx, &valuev1.CreateRequest{
+		Key:   args.Key(),
+		Value: args.Value(),
+		Batch: string(args.Batch()),
+	})
+	if err != nil {
+		return nil, CleanError(err.Error())
+	}
+
+	record, err := ToValueDomain(res.GetRecord())
+	if err != nil {
+		return nil, err
+	}
+
+	i.logger.Info(fmt.Sprintf("saved value with id: %s", record.ID()))
+	return ddd.NewResponse(ddd.ResponseArgs[values.Domain]{
+		Record: record,
+	}), nil
+}
+
+func (i *valueService) ListByPage(ctx context.Context, args ddd.PaginationArgs) (*ddd.Response[values.Domain], error) {
+	ctx = GrpcMetadata(ctx)
+
+	conn := valuev1.NewValueServiceClient(i.conn)
+	ctx = GrpcMetadata(ctx)
+	res, err := conn.ReadAll(ctx, &valuev1.ReadAllRequest{Query: &commonv1.Query{
 		Limit: uint32(args.Limit),
 		Page:  uint64(args.Page),
 	}})
@@ -102,9 +77,9 @@ func (i *yearService) ListByPage(ctx context.Context, args ddd.PaginationArgs) (
 		return nil, CleanError(err.Error())
 	}
 
-	records := make([]*year.Domain, 0)
+	records := make([]*values.Domain, 0)
 	for _, o := range res.Records {
-		record, err := ToDomain(o)
+		record, err := ToValueDomain(o)
 		if err != nil {
 			return nil, err
 		}
@@ -112,7 +87,7 @@ func (i *yearService) ListByPage(ctx context.Context, args ddd.PaginationArgs) (
 	}
 
 	i.logger.Info(fmt.Sprintf("fetch %d user by limit: %d and page: %d", len(records), args.Limit, args.Page))
-	return ddd.NewResponse(ddd.ResponseArgs[year.Domain]{
+	return ddd.NewResponse(ddd.ResponseArgs[values.Domain]{
 		Pagination: ddd.PaginationArgs{
 			Limit: int(res.Option.Pagination.GetLimit()),
 			Page:  int(res.Option.Pagination.GetPage()),
@@ -123,19 +98,46 @@ func (i *yearService) ListByPage(ctx context.Context, args ddd.PaginationArgs) (
 	}), nil
 }
 
-func (i *yearService) List(ctx context.Context) (*ddd.Response[core.Option], error) {
+func (i *valueService) List(ctx context.Context) (*ddd.Response[core.Option], error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func NewYear(logger *zap.Logger) year.Service {
+func (i *valueService) ListByBatch(ctx context.Context, batch values.Batch) (*ddd.Response[core.Option], error) {
+	ctx = GrpcMetadata(ctx)
+
+	conn := valuev1.NewValueServiceClient(i.conn)
+	ctx = GrpcMetadata(ctx)
+	res, err := conn.ReadByBatch(ctx, &valuev1.ReadByGroupRequest{
+		Batch: string(batch),
+	})
+
+	if err != nil {
+		return nil, CleanError(err.Error())
+	}
+
+	records := make([]*core.Option, len(res.Records))
+	for i, o := range res.Records {
+		records[i] = &core.Option{
+			Label: o.Label,
+			Value: o.Value,
+		}
+	}
+
+	i.logger.Info(fmt.Sprintf("fetch %d user by batch: %s", len(records), batch))
+	return ddd.NewResponse(ddd.ResponseArgs[core.Option]{
+		Records: records,
+	}), nil
+}
+
+func NewValue(logger *zap.Logger) values.Service {
 	addr := config.NewEnvs().EnvStr("MANAGEMENT_SERVER_ADDR")
 	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 
-	return &yearService{
+	return &valueService{
 		conn:   conn,
 		logger: logger,
 	}

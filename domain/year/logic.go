@@ -32,42 +32,27 @@ func Existing(args Args) (*Domain, error) {
 		Aggregation: Aggregation,
 		start:       args.Start,
 		end:         args.End,
-		isActive:    args.IsActive,
 	}, nil
 }
 
 func validation(args Args) error {
 	errors := make([]string, 0)
 
-	start := fmt.Sprintf("%d", args.Start)
-	end := fmt.Sprintf("%d", args.End)
-	diff := args.End - args.Start
-
-	if len(start) == 0 {
+	if args.Start == 0 {
 		errors = append(errors, "start is required")
 	}
 
-	if len(end) == 0 {
+	if args.End == 0 {
 		errors = append(errors, "end is required")
 	}
 
-	if len(start) < 4 || len(start) < 4 {
-		errors = append(errors, "invalid start date")
+	different := args.End - args.Start
+
+	if args.End < args.Start {
+		return fiber.NewError(fiber.StatusBadRequest, "start must be greater than end year")
 	}
 
-	if len(end) < 4 || len(end) < 4 {
-		errors = append(errors, "invalid end date")
-	}
-
-	if len(end) == 0 {
-		errors = append(errors, "end is required")
-	}
-
-	if args.Start > args.End {
-		return fiber.NewError(fiber.StatusBadRequest, "start must be lesser than end year")
-	}
-
-	if diff < 1 || diff > 1 {
+	if different < 1 || different > 1 {
 		errors = append(errors, "year must be between 1 year")
 	}
 

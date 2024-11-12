@@ -2,13 +2,13 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
 	"github.com/moriba-build/ose/ddd/utils/stn"
-	"github.com/moriba-cloud/skultem-management/api/rest/validations"
-	"github.com/moriba-cloud/skultem-management/domain/values"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/middlewares"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/validations"
+	"github.com/moriba-cloud/skultem-gateway/domain/values"
 	"go.uber.org/zap"
 	"time"
 )
@@ -47,26 +47,6 @@ func ValuesResponse(o *values.Domain) *Values {
 	}
 }
 
-func (r *rValues) one(c *fiber.Ctx) error {
-	payload := new(dto.ById)
-	if err := c.ParamsParser(payload); err != nil {
-		return err
-	}
-	if err := r.validation.Run(payload); err != nil {
-		return err
-	}
-
-	res, err := r.app.One(c.Context(), payload.Id)
-	if err != nil {
-		return fiber.NewError(fiber.StatusNotFound, err.Error())
-	}
-
-	log.Infof("values with id: %s fetched", res.Record().ID())
-	return c.JSON(dto.NewResponse[Values](dto.ResponseArgs[Values]{
-		Record: ValuesResponse(res.Record()),
-	}))
-}
-
 func (r *rValues) listByPage(c *fiber.Ctx) error {
 	payload := new(dto.Pagination)
 	if err := c.QueryParser(payload); err != nil {
@@ -100,7 +80,7 @@ func (r *rValues) listByPage(c *fiber.Ctx) error {
 	}))
 }
 
-func (r *rValues) listByGroup(c *fiber.Ctx) error {
+func (r *rValues) listByBatch(c *fiber.Ctx) error {
 	value := c.Params("value")
 	if len(value) <= 0 {
 		return fiber.NewError(fiber.StatusBadRequest, "value is empty")
@@ -177,10 +157,9 @@ func ValuesRoute(api fiber.Router, app values.App, logger *zap.Logger) {
 		logger:     logger,
 	}
 
-	router := api.Group("/values")
+	router := api.Group("/management/values", middlewares.AccessTokenGuard)
 	router.Get("", r.listByPage)
 	router.Get("/option", r.list)
-	router.Get("/batch/:value", r.listByGroup)
-	router.Get("/:id", r.one)
+	router.Get("/batch/:value", r.listByBatch)
 	router.Post("", r.new)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/middlewares"
 	"github.com/moriba-cloud/skultem-gateway/domain/year"
 	"go.uber.org/zap"
 	"time"
@@ -19,16 +20,16 @@ type (
 	}
 	Year struct {
 		Id        string    `json:"id"`
-		Start     int32     `json:"start"`
-		End       int32     `json:"end"`
+		Start     int64     `json:"start"`
+		End       int64     `json:"end"`
 		Year      string    `json:"year"`
 		State     ddd.State `json:"state"`
 		CreatedAt string    `json:"createdAt"`
 		UpdatedAt string    `json:"updatedAt"`
 	}
 	YearRequest struct {
-		Start int32 `json:"start" validate:"required"`
-		End   int32 `json:"end" validate:"required"`
+		Start int64 `json:"start" validate:"required"`
+		End   int64 `json:"end" validate:"required"`
 	}
 )
 
@@ -144,7 +145,7 @@ func YearRoute(api fiber.Router, app year.App, logger *zap.Logger) {
 		logger:     logger,
 	}
 
-	router := api.Group("/year")
+	router := api.Group("/management/year", middlewares.AccessTokenGuard)
 	router.Get("", r.listByPage)
 	router.Get("/option", r.list)
 	router.Get("/:id", r.one)

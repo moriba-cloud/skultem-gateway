@@ -15,11 +15,13 @@ func main() {
 	}
 
 	db := psql.Database(logger)
-	bus := management.NewBus()
-	apps := app.NewApps(app.Args{
-		Repos:  db,
+	managementService := management.NeeService(management.Args{
 		Logger: logger,
-		Bus:    bus,
+	})
+	apps := app.NewApps(app.Args{
+		Repos:      db,
+		Logger:     logger,
+		Management: managementService,
 	})
 
 	rest.Api(rest.Args{

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../devops/.idea/devops.iml" filepath="$PROJECT_DIR$/../devops/.idea/devops.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../pkgs/ose/.idea/ose.iml" filepath="$PROJECT_DIR$/../../pkgs/ose/.idea/ose.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/skultem-gateway.iml" filepath="$PROJECT_DIR$/.idea/skultem-gateway.iml" />
       <module fileurl="file://$PROJECT_DIR$/../skultem-management/.idea/skultem-management.iml" filepath="$PROJECT_DIR$/../skultem-management/.idea/skultem-management.iml" />
     </modules>

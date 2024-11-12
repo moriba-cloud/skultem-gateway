@@ -32,7 +32,7 @@ func (a aAuth) Login(ctx context.Context, email string, password string) (*ddd.R
 		return nil, fmt.Errorf("try again this password is incorrect")
 	}
 
-	token, err := auth.New(record.ID())
+	token, err := auth.New(record.ID(), record.School())
 
 	return ddd.NewResponse(ddd.ResponseArgs[auth.Domain]{
 		Record: token,

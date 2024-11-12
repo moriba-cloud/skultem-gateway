@@ -7,6 +7,7 @@ import (
 	"github.com/moriba-cloud/skultem-gateway/domain/role"
 	"github.com/moriba-cloud/skultem-gateway/domain/school"
 	"github.com/moriba-cloud/skultem-gateway/domain/user"
+	"github.com/moriba-cloud/skultem-gateway/domain/values"
 	"github.com/moriba-cloud/skultem-gateway/domain/year"
 	"github.com/moriba-cloud/skultem-gateway/infra/management"
 	"github.com/moriba-cloud/skultem-gateway/infra/psql/repos"
@@ -16,6 +17,7 @@ import (
 type (
 	Apps struct {
 		Year       year.App
+		Value      values.App
 		Feature    feature.App
 		Role       role.App
 		Permission permission.App
@@ -24,18 +26,21 @@ type (
 		School     school.App
 	}
 	Args struct {
-		Repos  *repos.Repos
-		Logger *zap.Logger
-		Bus    management.Bus
+		Repos      *repos.Repos
+		Management management.Services
+		Logger     *zap.Logger
 	}
 )
 
 func NewApps(args Args) *Apps {
 	return &Apps{
 		Year: NewYear(argsYear{
-			Bus:    args.Bus.Year,
-			Repo:   args.Repos.Year,
-			Logger: args.Logger,
+			Service: args.Management.Year,
+			Logger:  args.Logger,
+		}),
+		Value: NewValues(argsValue{
+			Service: args.Management.Value,
+			Logger:  args.Logger,
 		}),
 		Feature: NewFeature(argsFeature{
 			Repo:   args.Repos.Feature,

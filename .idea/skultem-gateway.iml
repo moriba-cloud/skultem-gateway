@@ -7,5 +7,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="devops" />
     <orderEntry type="module" module-name="skultem-management" />
+    <orderEntry type="module" module-name="ose" />
   </component>
 </module>

@@ -24,15 +24,7 @@ func (a aYear) New(ctx context.Context, args year.Args) (*ddd.Response[year.Doma
 	if err != nil {
 		return nil, err
 	}
-
-	record, err := a.service.Save(ctx, *o)
-	if err != nil {
-		return nil, err
-	}
-
-	return ddd.NewResponse[year.Domain](ddd.ResponseArgs[year.Domain]{
-		Record: record,
-	}), nil
+	return a.service.Save(ctx, *o)
 }
 
 func (a aYear) One(ctx context.Context, id string) (*ddd.Response[year.Domain], error) {
