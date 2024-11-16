@@ -1,4 +1,4 @@
-package routes
+package authorization
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -6,6 +6,7 @@ import (
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
 	"github.com/moriba-cloud/skultem-gateway/api/rest/middlewares"
+	core2 "github.com/moriba-cloud/skultem-gateway/api/rest/routes"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
 	"github.com/moriba-cloud/skultem-gateway/domain/user"
 	"go.uber.org/zap"
@@ -19,16 +20,16 @@ type (
 		logger     *zap.Logger
 	}
 	User struct {
-		Id          string    `json:"id"`
-		GivenNames  string    `json:"givenNames"`
-		FamilyName  string    `json:"familyName"`
-		Email       string    `json:"email"`
-		Phone       int       `json:"phone"`
-		Role        Reference `json:"role"`
-		PasswordTxt string    `json:"password"`
-		State       ddd.State `json:"state"`
-		CreatedAt   string    `json:"createdAt"`
-		UpdatedAt   string    `json:"updatedAt"`
+		Id          string          `json:"id"`
+		GivenNames  string          `json:"givenNames"`
+		FamilyName  string          `json:"familyName"`
+		Email       string          `json:"email"`
+		Phone       int             `json:"phone"`
+		Role        core2.Reference `json:"role"`
+		PasswordTxt string          `json:"password"`
+		State       ddd.State       `json:"state"`
+		CreatedAt   string          `json:"createdAt"`
+		UpdatedAt   string          `json:"updatedAt"`
 	}
 	UserRequest struct {
 		GivenNames string `json:"givenNames" validate:"required"`
@@ -45,7 +46,7 @@ func UserResponse(o *user.Domain) *User {
 		GivenNames: o.GivenNames(),
 		FamilyName: o.FamilyName(),
 		Email:      o.Email(),
-		Role: Reference{
+		Role: core2.Reference{
 			Id:    o.Role().Id,
 			Value: o.Role().Value,
 		},
@@ -97,15 +98,15 @@ func (a apiUser) list(c *fiber.Ctx) error {
 		return err
 	}
 
-	records := make([]*Option, 0)
+	records := make([]*core2.Option, 0)
 	for _, record := range res.Records() {
-		records = append(records, &Option{
+		records = append(records, &core2.Option{
 			Label: record.Label,
 			Value: record.Value,
 		})
 	}
 
-	return c.JSON(dto.NewResponse(dto.ResponseArgs[Option]{
+	return c.JSON(dto.NewResponse(dto.ResponseArgs[core2.Option]{
 		Records: records,
 	}))
 }

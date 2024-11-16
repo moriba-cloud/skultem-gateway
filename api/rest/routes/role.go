@@ -1,4 +1,4 @@
-package routes
+package authorization
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -6,6 +6,7 @@ import (
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
 	"github.com/moriba-cloud/skultem-gateway/api/rest/middlewares"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/routes"
 	"github.com/moriba-cloud/skultem-gateway/domain/role"
 	"go.uber.org/zap"
 	"time"
@@ -37,7 +38,7 @@ func RoleResponse(o *role.Domain) *Role {
 	for i, p := range o.Permissions() {
 		permissions[i] = Permission{
 			Id: p.ID(),
-			Feature: Reference{
+			Feature: routes.Reference{
 				Id:    p.Feature().Id,
 				Value: p.Feature().Value,
 			},
@@ -102,15 +103,15 @@ func (a apiRole) list(c *fiber.Ctx) error {
 		return err
 	}
 
-	records := make([]*Option, 0)
+	records := make([]*routes.Option, 0)
 	for _, record := range res.Records() {
-		records = append(records, &Option{
+		records = append(records, &routes.Option{
 			Label: record.Label,
 			Value: record.Value,
 		})
 	}
 
-	return c.JSON(dto.NewResponse(dto.ResponseArgs[Option]{
+	return c.JSON(dto.NewResponse(dto.ResponseArgs[routes.Option]{
 		Records: records,
 	}))
 }

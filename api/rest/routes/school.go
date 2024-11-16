@@ -1,4 +1,4 @@
-package routes
+package client
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -6,6 +6,8 @@ import (
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
 	"github.com/moriba-build/ose/domain"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/routes"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/routes/authorization"
 	"github.com/moriba-cloud/skultem-gateway/domain/school"
 	"github.com/moriba-cloud/skultem-gateway/domain/user"
 	"go.uber.org/zap"
@@ -26,20 +28,20 @@ type (
 		Phone      int    `json:"phone"`
 	}
 	School struct {
-		Id        string    `json:"id"`
-		Name      string    `json:"name"`
-		Domain    string    `json:"domain"`
-		Email     string    `json:"email"`
-		Region    string    `json:"region"`
-		District  string    `json:"district"`
-		Chiefdom  string    `json:"chiefdom"`
-		City      string    `json:"city"`
-		Street    string    `json:"street"`
-		Phones    []int     `json:"phones"`
-		Users     []*User   `json:"users"`
-		State     ddd.State `json:"state"`
-		CreatedAt string    `json:"createdAt"`
-		UpdatedAt string    `json:"updatedAt"`
+		Id        string                `json:"id"`
+		Name      string                `json:"name"`
+		Domain    string                `json:"domain"`
+		Email     string                `json:"email"`
+		Region    string                `json:"region"`
+		District  string                `json:"district"`
+		Chiefdom  string                `json:"chiefdom"`
+		City      string                `json:"city"`
+		Street    string                `json:"street"`
+		Phones    []int                 `json:"phones"`
+		Users     []*authorization.User `json:"users"`
+		State     ddd.State             `json:"state"`
+		CreatedAt string                `json:"createdAt"`
+		UpdatedAt string                `json:"updatedAt"`
 	}
 	OwnerRequest struct {
 		GivenNames string `json:"givenNames" validate:"required"`
@@ -63,14 +65,14 @@ type (
 
 func SchoolResponse(o *school.Domain) *School {
 	phones := make([]int, len(o.Phones()))
-	users := make([]*User, len(o.Users()))
+	users := make([]*authorization.User, len(o.Users()))
 
 	for i, phone := range o.Phones() {
 		phones[i] = phone.Number()
 	}
 
 	for i, u := range o.Users() {
-		users[i] = UserResponse(&u)
+		users[i] = authorization.UserResponse(&u)
 	}
 
 	return &School{
@@ -149,15 +151,15 @@ func (a apiSchool) list(c *fiber.Ctx) error {
 		return err
 	}
 
-	records := make([]*Option, 0)
+	records := make([]*routes.Option, 0)
 	for _, record := range res.Records() {
-		records = append(records, &Option{
+		records = append(records, &routes.Option{
 			Label: record.Label,
 			Value: record.Value,
 		})
 	}
 
-	return c.JSON(dto.NewResponse(dto.ResponseArgs[Option]{
+	return c.JSON(dto.NewResponse(dto.ResponseArgs[routes.Option]{
 		Records: records,
 	}))
 }

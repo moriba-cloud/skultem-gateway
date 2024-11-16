@@ -1,4 +1,4 @@
-package routes
+package authorization
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -80,15 +80,15 @@ func (a apiFeature) list(c *fiber.Ctx) error {
 		return err
 	}
 
-	records := make([]*Option, 0)
+	records := make([]*routes.Option, 0)
 	for _, record := range res.Records() {
-		records = append(records, &Option{
+		records = append(records, &routes.Option{
 			Label: record.Label,
 			Value: record.Value,
 		})
 	}
 
-	return c.JSON(dto.NewResponse(dto.ResponseArgs[Option]{
+	return c.JSON(dto.NewResponse(dto.ResponseArgs[routes.Option]{
 		Records: records,
 	}))
 }

@@ -1,4 +1,4 @@
-package routes
+package management
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -7,6 +7,7 @@ import (
 	"github.com/moriba-build/ose/ddd/rest/validation"
 	"github.com/moriba-build/ose/ddd/utils/stn"
 	"github.com/moriba-cloud/skultem-gateway/api/rest/middlewares"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/routes/core"
 	"github.com/moriba-cloud/skultem-gateway/api/rest/validations"
 	"github.com/moriba-cloud/skultem-gateway/domain/values"
 	"go.uber.org/zap"
@@ -91,15 +92,15 @@ func (r *rValues) listByBatch(c *fiber.Ctx) error {
 		return err
 	}
 
-	records := make([]*Option, 0)
+	records := make([]*core.Option, 0)
 	for _, record := range res.Records() {
-		records = append(records, &Option{
+		records = append(records, &core.Option{
 			Label: record.Label,
 			Value: record.Value,
 		})
 	}
 
-	return c.JSON(dto.NewResponse(dto.ResponseArgs[Option]{
+	return c.JSON(dto.NewResponse(dto.ResponseArgs[core.Option]{
 		Records: records,
 	}))
 }
@@ -110,15 +111,15 @@ func (r *rValues) list(c *fiber.Ctx) error {
 		return err
 	}
 
-	records := make([]*Option, 0)
+	records := make([]*core.Option, 0)
 	for _, record := range res.Records() {
-		records = append(records, &Option{
+		records = append(records, &core.Option{
 			Label: record.Label,
 			Value: record.Value,
 		})
 	}
 
-	return c.JSON(dto.NewResponse(dto.ResponseArgs[Option]{
+	return c.JSON(dto.NewResponse(dto.ResponseArgs[core.Option]{
 		Records: records,
 	}))
 }
@@ -157,7 +158,7 @@ func ValuesRoute(api fiber.Router, app values.App, logger *zap.Logger) {
 		logger:     logger,
 	}
 
-	router := api.Group("/management/values", middlewares.AccessTokenGuard)
+	router := api.Group("/values", middlewares.AccessTokenGuard)
 	router.Get("", r.listByPage)
 	router.Get("/option", r.list)
 	router.Get("/batch/:value", r.listByBatch)

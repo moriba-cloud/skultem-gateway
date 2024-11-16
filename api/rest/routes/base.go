@@ -1,4 +1,4 @@
-package routes
+package base
 
 import (
 	"fmt"
@@ -6,6 +6,8 @@ import (
 	"github.com/leekchan/accounting"
 	"github.com/moriba-build/ose/ddd"
 	"github.com/moriba-build/ose/ddd/config"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/routes/authorization"
+	routes2 "github.com/moriba-cloud/skultem-gateway/api/rest/routes/management"
 	"github.com/moriba-cloud/skultem-gateway/app"
 	"go.uber.org/zap"
 )
@@ -76,12 +78,12 @@ func Routes(args Args) {
 	route := args.Route.Group(apiVersion)
 
 	// routes
-	YearRoute(route, args.Apps.Year, args.Logger)
-	ValuesRoute(route, args.Apps.Value, args.Logger)
-	FeatureRoute(route, args.Apps.Feature, args.Logger)
-	RoleRoute(route, args.Apps.Role, args.Logger)
-	PermissionRoute(route, args.Apps.Permission, args.Logger)
-	UserRoute(route, args.Apps.User, args.Logger)
-	AuthRoute(route, args.Apps.Auth, args.Logger)
-	SchoolRoute(route, args.Apps.School, args.Logger)
+	authorization.YearRoute(route, args.Apps.Year, args.Logger)
+	routes2.ValuesRoute(route, args.Apps.Value, args.Logger)
+	authorization.FeatureRoute(route, args.Apps.Feature, args.Logger)
+	authorization.RoleRoute(route, args.Apps.Role, args.Logger)
+	authorization.PermissionRoute(route, args.Apps.Permission, args.Logger)
+	authorization.UserRoute(route, args.Apps.User, args.Logger)
+	authorization.AuthRoute(route, args.Apps.Auth, args.Logger)
+	authorization.SchoolRoute(route, args.Apps.School, args.Logger)
 }

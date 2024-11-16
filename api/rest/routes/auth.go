@@ -1,10 +1,11 @@
-package routes
+package authorization
 
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
 	"github.com/moriba-cloud/skultem-gateway/api/rest/middlewares"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/routes/core"
 	"github.com/moriba-cloud/skultem-gateway/domain/auth"
 	"go.uber.org/zap"
 )
@@ -25,7 +26,7 @@ type (
 		FamilyName string
 		Phone      int
 		Email      string
-		Role       Reference
+		Role       core.Reference
 		School     string
 		State      string
 	}
@@ -49,7 +50,7 @@ func AuthUserResponse(o *auth.User) *AuthUser {
 		FamilyName: o.FamilyName,
 		Phone:      o.Phone,
 		Email:      o.Email,
-		Role: Reference{
+		Role: core.Reference{
 			Id:    o.Role.Id,
 			Value: o.Role.Value,
 		},

@@ -1,4 +1,4 @@
-package routes
+package authorization
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -6,6 +6,7 @@ import (
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
 	"github.com/moriba-cloud/skultem-gateway/api/rest/middlewares"
+	core2 "github.com/moriba-cloud/skultem-gateway/api/rest/routes"
 	"github.com/moriba-cloud/skultem-gateway/domain/core"
 	"github.com/moriba-cloud/skultem-gateway/domain/permission"
 	"go.uber.org/zap"
@@ -19,16 +20,16 @@ type (
 		logger     *zap.Logger
 	}
 	Permission struct {
-		Id        string    `json:"id"`
-		Feature   Reference `json:"feature"`
-		Create    bool      `json:"create"`
-		ReadAll   bool      `json:"readAll"`
-		Read      bool      `json:"read"`
-		Edit      bool      `json:"edit"`
-		Delete    bool      `json:"delete"`
-		State     ddd.State `json:"state"`
-		CreatedAt string    `json:"createdAt"`
-		UpdatedAt string    `json:"updatedAt"`
+		Id        string          `json:"id"`
+		Feature   core2.Reference `json:"feature"`
+		Create    bool            `json:"create"`
+		ReadAll   bool            `json:"readAll"`
+		Read      bool            `json:"read"`
+		Edit      bool            `json:"edit"`
+		Delete    bool            `json:"delete"`
+		State     ddd.State       `json:"state"`
+		CreatedAt string          `json:"createdAt"`
+		UpdatedAt string          `json:"updatedAt"`
 	}
 	One struct {
 		Feature string `json:"feature" validate:"required"`
@@ -46,7 +47,7 @@ type (
 func PermissionResponse(o *permission.Domain) *Permission {
 	return &Permission{
 		Id: o.ID(),
-		Feature: Reference{
+		Feature: core2.Reference{
 			Id:    o.Feature().Id,
 			Value: o.Feature().Value,
 		},

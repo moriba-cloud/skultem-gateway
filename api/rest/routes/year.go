@@ -1,4 +1,4 @@
-package routes
+package client
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"github.com/moriba-build/ose/ddd/rest/dto"
 	"github.com/moriba-build/ose/ddd/rest/validation"
 	"github.com/moriba-cloud/skultem-gateway/api/rest/middlewares"
+	"github.com/moriba-cloud/skultem-gateway/api/rest/routes"
 	"github.com/moriba-cloud/skultem-gateway/domain/year"
 	"go.uber.org/zap"
 	"time"
@@ -103,15 +104,15 @@ func (a apiYear) list(c *fiber.Ctx) error {
 		return err
 	}
 
-	records := make([]*Option, 0)
+	records := make([]*routes.Option, 0)
 	for _, record := range res.Records() {
-		records = append(records, &Option{
+		records = append(records, &routes.Option{
 			Label: record.Label,
 			Value: record.Value,
 		})
 	}
 
-	return c.JSON(dto.NewResponse(dto.ResponseArgs[Option]{
+	return c.JSON(dto.NewResponse(dto.ResponseArgs[routes.Option]{
 		Records: records,
 	}))
 }
